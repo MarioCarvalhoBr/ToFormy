@@ -12,8 +12,13 @@ import App from "./App.vue";
 
 // Composables
 import { createApp } from "vue";
+import { surveyPlugin } from "survey-vue3-ui";
+import { surveyCreatorPlugin } from "survey-creator-vue";
+
 
 const app = createApp(App);
+app.use(surveyPlugin);
+app.use(surveyCreatorPlugin);
 
 registerPlugins(app);
 

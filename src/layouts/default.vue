@@ -39,12 +39,11 @@
 <script setup>
   import { ref } from 'vue'
 
-  const cards = ['Today', 'Yesterday']
   const links = [
     // Home page
     ['mdi-home', 'Home', '/'],
-    // My forms
-    ['mdi-form-select', 'My Forms', '/forms'],
+    // My Surveys
+    ['mdi-form-select', 'My Surveys', '/survey'],
     // Trash
     ['mdi-delete', 'Trash', '/trash'],
     // About

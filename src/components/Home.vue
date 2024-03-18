@@ -27,7 +27,7 @@
         <v-col cols="auto">
           <v-btn
             color="primary"
-            @click="() => $router.push('/forms')"
+            @click="() => $router.push('/survey')"
             min-width="228"
             rel="noopener noreferrer"
             size="x-large"
@@ -38,7 +38,7 @@
             icon="mdi-book-open-variant"
              size="large" start />
 
-            My Forms
+            My Surveys
           </v-btn>
         </v-col>
 

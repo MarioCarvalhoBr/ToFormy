@@ -1,33 +1,47 @@
 <template>
-  <v-form v-model="valid">
-    <v-container>
-      <v-row>
-        <v-col cols="12" md="4">
-          <v-text-field v-model="first_name" :counter="10" :rules="nameRules" label="First name" hide-details
-            required></v-text-field>
-        </v-col>
 
-        <v-col cols="12" md="4">
-          <v-text-field v-model="last_name" :counter="10" :rules="nameRules" label="Last name" hide-details
-            required></v-text-field>
-        </v-col>
+  <div>
 
-        <v-col cols="12" md="4">
-          <v-text-field v-model="email" :rules="emailRules" label="E-mail" hide-details required></v-text-field>
+
+
+    <v-form v-model="valid">
+      <h1>Add form</h1>
+
+      <v-container>
+        <v-row>
+          <v-col cols="12" md="4">
+            <v-text-field v-model="first_name" :counter="10" :rules="nameRules" label="First name" hide-details
+              required></v-text-field>
+          </v-col>
+
+          <v-col cols="12" md="4">
+            <v-text-field v-model="last_name" :counter="10" :rules="nameRules" label="Last name" hide-details
+              required></v-text-field>
+          </v-col>
+
+          <v-col cols="12" md="4">
+            <v-text-field v-model="email" :rules="emailRules" label="E-mail" hide-details required></v-text-field>
+          </v-col>
+        </v-row>
+        <v-col cols="12" md="4" sm="6">
+          <v-btn rounded="xs" @click="addFriend" size="x-large" block>Add user</v-btn>
         </v-col>
-      </v-row>
-      <v-col cols="12" md="4" sm="6">
-        <v-btn rounded="xs" @click="addFriend" size="x-large" block>Add user</v-btn>
-      </v-col>
-      <p>{{ status }}</p>
-    </v-container>
-  </v-form>
+        <p>{{ status }}</p>
+      </v-container>
+    </v-form>
+
+
+  </div>
 </template>
 
 <script>
-import { db } from '../db';
-import { uuid } from "vue-idb";
-import contracts from '../contracts'
+import { db } from '../../db';
+import { v4 as uuid } from 'uuid';
+
+// Leia o arquivo Form.js e Survey.js da pasta contracts e crie um objeto JSON com os dados
+// Importando os arquivos JSON
+import formData from '../../contracts/Form.json';
+import surveyData from '../../contracts/Survey.json';
 
 
 export default {
@@ -65,10 +79,16 @@ export default {
     ],
   }),
 
-  created () {
+  mounted() {
+    console.log('mounted - Create.vue');
+  },
+
+  created() {
+    console.log('created - Create.vue');
+
     // init survey
-    this.survey = JSON.parse(JSON.stringify(contracts['Survey']))
-    this.form = JSON.parse(JSON.stringify(contracts['Form']))
+    this.survey = surveyData;
+    this.form = formData;
   },
 
   methods: {

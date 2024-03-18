@@ -27,7 +27,7 @@
         <v-col cols="auto">
           <v-btn
             color="primary"
-            @click="() => $router.push('/survey')"
+            @click="() => $router.push('/survey/list')"
             min-width="228"
             rel="noopener noreferrer"
             size="x-large"

@@ -43,7 +43,7 @@
     // Home page
     ['mdi-home', 'Home', '/'],
     // My Surveys
-    ['mdi-form-select', 'My Surveys', '/survey'],
+    ['mdi-form-select', 'My Surveys', '/survey/list'],
     // Trash
     ['mdi-delete', 'Trash', '/trash'],
     // About

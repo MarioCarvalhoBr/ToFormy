@@ -33,7 +33,7 @@
     <br>
     <v-row>
       <v-col v-for="form in forms" :key="form.id" cols="12" md="6" lg="3">
-        <v-card class="elevation-4" color="secondary" dark>
+        <v-card class="elevation-8" color="primary" dark>
           <v-card-title>{{ form.first_name }} {{ form.last_name }}</v-card-title>
           <v-card-text>{{ form.street_address }}, {{ form.city }}, {{ form.state }}, {{ form.zip }}, {{ form.country
             }}</v-card-text>
@@ -42,13 +42,24 @@
           <div class="">
             <v-card-subtitle> Updated: {{ new Date(form.changed).toLocaleDateString("pt-BR") }}</v-card-subtitle>
             <v-card-subtitle> Created: {{ new Date(form.created).toLocaleDateString("pt-BR") }}</v-card-subtitle>
+
           </div>
 
-          <v-card-actions>
-            <v-btn text @click="() => $router.push('/form/' + form.id)">View</v-btn>
-            <v-btn text @click="openDialogEditForm(form)">Edit</v-btn>
-            <v-btn text @click="openDialogDeleteForm(form)">Delete</v-btn>
-          </v-card-actions>
+          <br>
+
+          <v-divider></v-divider>
+
+
+          <v-col cols="12">
+            <v-row justify="center">
+              <v-btn size="small" class="ma-2" color="blue-darken-4" icon="mdi-eye" @click="() => $router.push('/form/' + form.code)"></v-btn>
+              <v-btn size="small" class="ma-2" color="orange-darken-2" icon="mdi-pencil" @click="openDialogEditForm(form)"></v-btn>
+              <v-btn size="small" class="ma-2" color="red-darken-2" icon="mdi-delete" @click="openDialogDeleteForm(form)"></v-btn>
+            </v-row>
+          </v-col>
+
+
+
         </v-card>
       </v-col>
     </v-row>
@@ -85,7 +96,7 @@
           <v-row dense>
             <v-col cols="12">
               <!--<p>Are you sure you want to delete the form '{form_delete?.name}'?</p>-->
-              <p>Are you sure you want to delete the form '{{ form_delete ? form_delete.name : '' }}'?</p>
+              <p>Are you sure you want to delete the form '{{ form_delete ? form_delete.first_name : '' }}'? <strong>This action cannot be undone.</strong></p>
             </v-col>
           </v-row>
         </v-card-text>
@@ -260,14 +271,12 @@ const snackbar = ref({
   elevation: 24
 })
 
-// Array de forms:
+// Arrays
 let forms = ref([])
 
 const openDialogAddForm = () => {
   dialog.value = true
   form_title.value = 'Create a new form'
-
-
 }
 
 const openDialogEditForm = (form) => {
@@ -284,7 +293,7 @@ const openDialogEditForm = (form) => {
 
 // openDialogDeleteForm(form)
 const openDialogDeleteForm = (form) => {
-  console.log('Delete form', form);
+  console.log('Delete form: ', form);
   dialogDelete.value = true;
   form_delete.value = form;
 
@@ -297,6 +306,7 @@ const closeDialog = () => {
 
   dialog.value = false;
   dialogDelete.value = false;
+
   loadForms();
 }
 
@@ -417,17 +427,18 @@ const createSnackbar = (text, color = 'green', timeout = 3000) => {
 const deleteFormDB = async () => {
   try {
     await db.form.delete(form_delete.value.id);
-    console.log(`Form ${form_delete.value.name} successfully deleted`);;
+    console.log(`Form ${form_delete.value.name} successfully deleted`);
 
-    closeDialog();
-
-    // Reload forms
-    loadForms();
-
+    // Create snackbar
+    createSnackbar(`Form ${form_delete.value.name} successfully deleted`, 'red', 3000);
 
   } catch (error) {
-    console.log(`Failed to delete ${form_delete.value.name}: ${error}`);
+    let text = `Failed to delete ${form_delete.value.name}: ${error}`;
+    createAlert(text, 'error', 'Error', 'mdi-alert');
+    console.log(text);
   }
+
+  closeDialog();
 }
 
 // Método onMounted

@@ -15,7 +15,7 @@
 
     <v-row>
       <v-col v-for="survey in surveys" :key="survey.id" cols="12" md="6" lg="3">
-        <v-card class="elevation-4" color="secondary" dark>
+        <v-card class="elevation-4" color="indigo-darken-3" dark>
           <v-card-title>{{ survey.name }}</v-card-title>
           <v-card-text>{{ survey.description }}</v-card-text>
 
@@ -24,12 +24,18 @@
             <v-card-subtitle> Updated: {{ new Date(survey.changed).toLocaleDateString() }}</v-card-subtitle>
             <v-card-subtitle> Created: {{ new Date(survey.created).toLocaleDateString() }}</v-card-subtitle>
           </div>
+          <br>
 
-          <v-card-actions>
-            <v-btn text @click="() => $router.push('/survey/' + survey.code)">View</v-btn>
-            <v-btn text @click="openDialogEditSurvey(survey)">Edit</v-btn>
-            <v-btn text @click="openDialogRemoveSurvey(survey)">Remove</v-btn>
-          </v-card-actions>
+          <v-divider></v-divider>
+
+          <v-col cols="12">
+            <v-row justify="center">
+              <v-btn size="small" class="ma-2" color="blue-darken-2" icon="mdi-eye" @click="() => $router.push('/survey/' + survey.code)"></v-btn>
+              <v-btn size="small" class="ma-2" color="orange-darken-2" icon="mdi-pencil" @click="openDialogEditSurvey(survey)"></v-btn>
+              <v-btn size="small" class="ma-2" color="red-darken-2" icon="mdi-delete" @click="openDialogRemoveSurvey(survey)"></v-btn>
+              <v-btn size="small" class="ma-2" color="black-darken-2" icon="mdi-share-variant"></v-btn>
+            </v-row>
+          </v-col>
         </v-card>
       </v-col>
     </v-row>
@@ -69,9 +75,7 @@
 
   <div class="pa-4 text-center">
     <v-dialog v-model="dialogMoveToTrash" max-width="600" persistent>
-      <v-card
-      prepend-icon="mdi-delete"
-       title="Move to trash">
+      <v-card prepend-icon="mdi-delete" title="Move to trash">
         <v-card-text>
           <v-row dense>
             <v-col cols="12">
@@ -235,9 +239,9 @@ const moveSurveyToTrashDB = async () => {
   try {
     // SET INACTIVE
     await db.survey.update(survey_remove.value.id, {
-        active: 0,
-        changed: new Date(),
-      });
+      active: 0,
+      changed: new Date(),
+    });
     // DELETE: await db.survey.delete(survey_remove.value.id);
     console.log(`Survey ${survey_remove.value.name} successfully deleted`);
 

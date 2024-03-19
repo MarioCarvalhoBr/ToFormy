@@ -14,7 +14,7 @@
     </div>
 
     <v-row>
-      <v-col v-for="survey in surveys" :key="survey.id" cols="12" md="6" lg="4">
+      <v-col v-for="survey in surveys" :key="survey.id" cols="12" md="6" lg="3">
         <v-card class="elevation-4" color="secondary" dark>
           <v-card-title>{{ survey.name }}</v-card-title>
           <v-card-text>{{ survey.description }}</v-card-text>
@@ -25,11 +25,18 @@
             <v-card-subtitle> Created: {{ new Date(survey.created).toLocaleDateString() }}</v-card-subtitle>
           </div>
 
-          <v-card-actions>
-            <v-btn text @click="() => $router.push('/survey/' + survey.code)">View</v-btn>
-            <v-btn text @click="openDialogRecoverySurvey(survey)">Recovery</v-btn>
-            <v-btn text @click="openDialogDeleteSurvey(survey)">Delete</v-btn>
-          </v-card-actions>
+          <br>
+
+          <v-divider></v-divider>
+
+
+          <v-col cols="12">
+            <v-row justify="center">
+              <v-btn size="small" class="ma-2" color="blue-darken-2" icon="mdi-eye" @click="() => $router.push('/survey/' + survey.code)"></v-btn>
+              <v-btn size="small" class="ma-2" color="yellow-darken-2" icon="mdi-backup-restore" @click="openDialogRecoverySurvey(survey)"></v-btn>
+              <v-btn size="small" class="ma-2" color="red-darken-2" icon="mdi-delete" @click="openDialogDeleteSurvey(survey)"></v-btn>
+            </v-row>
+          </v-col>
         </v-card>
       </v-col>
     </v-row>

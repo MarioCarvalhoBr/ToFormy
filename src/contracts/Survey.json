@@ -2,9 +2,11 @@
     "id": 0,
     "code": 0,
     "name": "Survey 1",
+
     "description": "Description 1",
     "city": "City 1",
     "state": "State 1",
+    
     "created": "2017-01-01",
     "changed": "2017-01-01",
     "active": true

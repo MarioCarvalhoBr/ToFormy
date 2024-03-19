@@ -1,9 +1,22 @@
 {
     "id": 0,
-    "survey_id": 0,
+    "survey_code": 0,
     "code": 0,
+    "name": "Form",
+
     "first_name": "John",
     "last_name": "Doe",
+    "age_range": 0,
+
+    "street_address": "123 Main St",
+    "city": "Anytown",
+    "state": "CA",
+    "zip": "12345",
+    "country": "USA",
+
+    "email": "",
+    "phone": "123-456-7890",
+
     "created": "2017-01-01",
     "changed": "2017-01-01",
     "active": true

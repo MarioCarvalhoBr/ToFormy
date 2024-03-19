@@ -55,6 +55,8 @@ const alertResults = (sender: any) => {
 
 const survey = new Model(surveyJson);
 survey.onComplete.add(alertResults);
+
+
 </script>
 
 <template>

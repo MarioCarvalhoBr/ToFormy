@@ -12,14 +12,13 @@
           <v-card-text>{{ survey.description }}</v-card-text>
 
 
-          <div class="d-flex align-center">
+          <div class="">
             <v-card-subtitle> Updated: {{ new Date(survey.changed).toLocaleDateString() }}</v-card-subtitle>
-
             <v-card-subtitle> Created: {{ new Date(survey.created).toLocaleDateString() }}</v-card-subtitle>
-    </div>
+          </div>
 
           <v-card-actions>
-            <v-btn text>View</v-btn>
+            <v-btn text @click="() => $router.push('/survey/' + survey.code)">View</v-btn>
             <v-btn text @click="openDialogEditSurvey(survey)">Edit</v-btn>
             <v-btn text @click="openDialogDeleteSurvey(survey)">Delete</v-btn>
           </v-card-actions>
@@ -67,7 +66,7 @@
           <v-row dense>
             <v-col cols="12">
               <!--<p>Are you sure you want to delete the survey '{survey_delete?.name}'?</p>-->
-              <p>Are you sure you want to delete the survey '{{survey_delete ? survey_delete.name : ''}}'?</p>
+              <p>Are you sure you want to delete the survey '{{ survey_delete ? survey_delete.name : '' }}'?</p>
             </v-col>
           </v-row>
         </v-card-text>
@@ -90,8 +89,6 @@ import { db } from '../../db';
 
 import { ref, onMounted } from 'vue'
 
-const variants = ['elevated', 'flat', 'tonal', 'outlined']
-const color = ref('indigo')
 const dialog = ref(false)
 const dialogDelete = ref(false)
 const form_title = ref('Create a new survey')

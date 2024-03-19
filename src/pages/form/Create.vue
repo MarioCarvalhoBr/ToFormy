@@ -102,7 +102,7 @@ export default {
           email: this.email,
           created: new Date(),
           changed: new Date(),
-          active: true,
+          active: 1,
         });
 
         this.status = `Friend ${this.first_name} successfully added. Got id ${id}`;

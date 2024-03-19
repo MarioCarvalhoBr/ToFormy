@@ -45,7 +45,7 @@
     // My Surveys
     ['mdi-form-select', 'My Surveys', '/survey/list'],
     // Trash
-    ['mdi-delete', 'Trash', '/trash'],
+    ['mdi-delete', 'Trash', '/survey/trash'],
     // About
     ['mdi-information', 'About', '/about'],
   ]

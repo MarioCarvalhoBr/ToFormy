@@ -5,6 +5,14 @@
       <v-btn color="primary" size="small" @click="openDialogAddSurvey">New Survey</v-btn>
     </div>
 
+    <div v-if="surveys.length === 0" class="text-center">
+      <br>
+      <v-divider></v-divider>
+      <br>
+      <h4>No surveys found</h4>
+      <p>Click on the 'New Survey' button to create a new survey</p>
+    </div>
+
     <v-row>
       <v-col v-for="survey in surveys" :key="survey.id" cols="12" md="6" lg="3">
         <v-card class="elevation-4" color="secondary" dark>
@@ -20,7 +28,7 @@
           <v-card-actions>
             <v-btn text @click="() => $router.push('/survey/' + survey.code)">View</v-btn>
             <v-btn text @click="openDialogEditSurvey(survey)">Edit</v-btn>
-            <v-btn text @click="openDialogDeleteSurvey(survey)">Delete</v-btn>
+            <v-btn text @click="openDialogRemoveSurvey(survey)">Remove</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -60,13 +68,15 @@
   </div>
 
   <div class="pa-4 text-center">
-    <v-dialog v-model="dialogDelete" max-width="600" persistent>
-      <v-card prepend-icon="mdi-form-select" title="Delete survey">
+    <v-dialog v-model="dialogMoveToTrash" max-width="600" persistent>
+      <v-card
+      prepend-icon="mdi-delete"
+       title="Move to trash">
         <v-card-text>
           <v-row dense>
             <v-col cols="12">
-              <!--<p>Are you sure you want to delete the survey '{survey_delete?.name}'?</p>-->
-              <p>Are you sure you want to delete the survey '{{ survey_delete ? survey_delete.name : '' }}'?</p>
+              <!--<p>Are you sure you want to delete the survey '{survey_remove?.name}'?</p>-->
+              <p>Are you sure you want move to trash the survey '{{ survey_remove ? survey_remove.name : '' }}'?</p>
             </v-col>
           </v-row>
         </v-card-text>
@@ -76,7 +86,7 @@
           <v-spacer></v-spacer>
 
           <v-btn text="Close" variant="plain" @click="closeDialog"></v-btn>
-          <v-btn color="error" text="Delete" variant="tonal" @click="deleteSurveyDB()"></v-btn>
+          <v-btn color="error" text="Remove" variant="tonal" @click="moveSurveyToTrashDB()"></v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -90,11 +100,11 @@ import { db } from '../../db';
 import { ref, onMounted } from 'vue'
 
 const dialog = ref(false)
-const dialogDelete = ref(false)
+const dialogMoveToTrash = ref(false)
 const form_title = ref('Create a new survey')
 const is_edit = ref(false)
 const survey_edit = ref(null)
-const survey_delete = ref(null)
+const survey_remove = ref(null)
 const surveyName = ref('')
 const surveyDescription = ref('')
 
@@ -127,18 +137,18 @@ const openDialogEditSurvey = (survey) => {
 
 }
 
-// openDialogDeleteSurvey(survey)
-const openDialogDeleteSurvey = (survey) => {
-  console.log('Delete survey', survey);
-  dialogDelete.value = true;
-  survey_delete.value = survey;
+// openDialogRemoveSurvey(survey)
+const openDialogRemoveSurvey = (survey) => {
+  console.log('Move survey to trash', survey);
+  dialogMoveToTrash.value = true;
+  survey_remove.value = survey;
 
 }
 
 const closeDialog = () => {
   resetForm();
   dialog.value = false;
-  dialogDelete.value = false;
+  dialogMoveToTrash.value = false;
 
 }
 
@@ -179,7 +189,7 @@ const resetForm = () => {
   surveyDescriptionError.value = '';
   is_edit.value = false;
   survey_edit.value = null;
-  survey_delete.value = null;
+  survey_remove.value = null;
 
 }
 
@@ -203,7 +213,7 @@ const createOrUpdateSurveyDBrveyDB = async () => {
         description: surveyDescription.value,
         created: new Date(),
         changed: new Date(),
-        active: true,
+        active: 1,
       });
 
       console.log(`Survey ${surveyName.value} successfully added. Got id ${id}`);
@@ -220,11 +230,16 @@ const createOrUpdateSurveyDBrveyDB = async () => {
     console.log(`Failed to add ${surveyName.value}: ${error}`);
   }
 }
-// Delete survey
-const deleteSurveyDB = async () => {
+// Delete survey (active to false)
+const moveSurveyToTrashDB = async () => {
   try {
-    await db.survey.delete(survey_delete.value.id);
-    console.log(`Survey ${survey_delete.value.name} successfully deleted`);
+    // SET INACTIVE
+    await db.survey.update(survey_remove.value.id, {
+        active: 0,
+        changed: new Date(),
+      });
+    // DELETE: await db.survey.delete(survey_remove.value.id);
+    console.log(`Survey ${survey_remove.value.name} successfully deleted`);
 
     // Reset data and close dialog
     resetForm();
@@ -236,14 +251,16 @@ const deleteSurveyDB = async () => {
 
 
   } catch (error) {
-    console.log(`Failed to delete ${survey_delete.value.name}: ${error}`);
+    console.log(`Failed to delete ${survey_remove.value.name}: ${error}`);
   }
 }
 
 // Método onMounted
 const loadSurveys = async () => {
   try {
-    surveys.value = await db.survey.toArray();
+    // Where active is true
+    surveys.value = await db.survey.where('active').equals(1).toArray();
+    // ERRO:  DataError: Failed to execute 'bound' on 'IDBKeyRange': The parameter is not a valid key.
     console.log(`Loaded ${surveys.value.length} surveys`);
   } catch (error) {
     console.log(`Failed to load surveys: ${error}`);

@@ -13,6 +13,24 @@
       <p>Click on the 'New Form' button to create a new form</p>
     </div>
 
+    <div class="text-center">
+      <v-snackbar v-model="snackbar.show" :timeout="snackbar.timeout" :color="snackbar.color"
+        :elevation="snackbar.elevation">
+        {{ snackbar.text }}
+
+        <template v-slot:actions>
+          <v-btn color="white" variant="text" @click="snackbar.show = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </template>
+      </v-snackbar>
+    </div>
+
+    <v-alert v-if="alert.show" closable :type="alert.type" dismissible transition="scale-transition" :icon="alert.icon">
+      <strong>{{ alert.title }}</strong>
+      <br>{{ alert.message }}
+    </v-alert>
+    <br>
     <v-row>
       <v-col v-for="form in forms" :key="form.id" cols="12" md="6" lg="3">
         <v-card class="elevation-4" color="secondary" dark>
@@ -22,8 +40,8 @@
 
 
           <div class="">
-            <v-card-subtitle> Updated: {{ new Date(form.changed).toLocaleDateString() }}</v-card-subtitle>
-            <v-card-subtitle> Created: {{ new Date(form.created).toLocaleDateString() }}</v-card-subtitle>
+            <v-card-subtitle> Updated: {{ new Date(form.changed).toLocaleDateString("pt-BR") }}</v-card-subtitle>
+            <v-card-subtitle> Created: {{ new Date(form.created).toLocaleDateString("pt-BR") }}</v-card-subtitle>
           </div>
 
           <v-card-actions>
@@ -92,15 +110,14 @@ import { Model } from 'survey-core';
 import { v4 as uuid } from 'uuid';
 import { db } from '../../db';
 
-import { useRoute, useRouter } from 'vue-router'
-const router = useRouter()
-const route = useRoute()
-
+import { useRoute, useRouter } from 'vue-router';
+const router = useRouter();
+const route = useRoute();
 
 const surveyJson = {
   "locale": "en",
   "completedHtml": {
-    "default": '<h3>Survey Completed!</h3>',
+    "default": '<h5>Thank you for completing the form!</h5>'
   },
   "pages": [
     {
@@ -227,6 +244,22 @@ const formName = ref('')
 const formDescription = ref('')
 const survey_code = ref(route.params.code);
 
+const alert = ref({
+  show: false,
+  message: '',
+  type: 'success',
+  title: 'Alert title',
+  icon: 'mdi-check-circle'
+})
+
+const snackbar = ref({
+  show: false,
+  text: 'Text snackbar',
+  color: 'success',
+  timeout: 3000,
+  elevation: 24
+})
+
 // Array de forms:
 let forms = ref([])
 
@@ -258,11 +291,13 @@ const openDialogDeleteForm = (form) => {
 }
 
 const closeDialog = () => {
+
+  // Resetar o survey
+  survey.clear();
+
   dialog.value = false;
   dialogDelete.value = false;
-
   loadForms();
-
 }
 
 const createOrUpdateFormDB = async (data) => {
@@ -298,6 +333,9 @@ const createOrUpdateFormDB = async (data) => {
     if (is_edit.value) {
       // Update the form
       await db.form.update(form_edit.value.id, {
+
+        name: data.first_name + ' ' + data.last_name,
+
         first_name: data.first_name,
         last_name: data.last_name,
         age_range: data.age_range,
@@ -320,7 +358,7 @@ const createOrUpdateFormDB = async (data) => {
       const id = await db.form.add({
         survey_code: survey_code.value,
         code: uuid(),
-        name: "Form",
+        name: data.first_name + ' ' + data.last_name,
 
         first_name: data.first_name,
         last_name: data.last_name,
@@ -337,19 +375,43 @@ const createOrUpdateFormDB = async (data) => {
 
         created: new Date(),
         changed: new Date(),
-        active: true,
+        active: 1,
       });
 
       console.log(`Form ${formName.value} successfully added. Got id ${id}`);
     }
 
-    closeDialog();
+    // Show alert
+    let message = `Form ${formName.value} successfully ${is_edit.value ? 'updated' : 'added'}`;
+    createSnackbar(message, 'green', 3000);
 
     // Reload forms
     loadForms();
   } catch (error) {
-    console.log(`Failed to add ${formName.value}: ${error}`);
+    let text = `Failed to add ${formName.value}: ${error}`;
+    createAlert(text, 'error', 'Error', 'mdi-alert');
+    console.log(text);
   }
+}
+// createAlert
+const createAlert = (message, type, title, icon = 'mdi-alert') => {
+  alert.value.message = message;
+  alert.value.type = type;
+  alert.value.title = title;
+  alert.value.icon = icon;
+  alert.value.show = true;
+
+  setTimeout(() => {
+    alert.value.show = false;
+  }, 5000);
+}
+
+//createSnackbar
+const createSnackbar = (text, color = 'green', timeout = 3000) => {
+  snackbar.value.text = text;
+  snackbar.value.color = color;
+  snackbar.value.timeout = timeout;
+  snackbar.value.show = true;
 }
 // Delete form
 const deleteFormDB = async () => {
@@ -372,21 +434,11 @@ const deleteFormDB = async () => {
 const loadForms = async () => {
   try {
     // Busca todos os forms que tem o survey_code and active = true
-    forms.value = await db.form.where('survey_code').equals(survey_code.value).and(form => form.active === true).toArray();
+    forms.value = await db.form.where('survey_code').equals(survey_code.value).and(form => form.active === 1).toArray();
     console.log(`Loaded ${forms.value.length} forms`);
     console.log('Forms:', forms.value[0]);
   } catch (error) {
     console.log(`Failed to load forms: ${error}`);
-  }
-}
-
-// Método onMounted
-const loadSurveys = async () => {
-  try {
-    surveys.value = await db.survey.toArray();
-    console.log(`Loaded ${surveys.value.length} surveys`);
-  } catch (error) {
-    console.log(`Failed to load surveys: ${error}`);
   }
 }
 

@@ -37,7 +37,7 @@
 
   <div class="pa-4 text-center">
     <v-dialog v-model="dialogDelete" max-width="600" persistent>
-      <v-card prepend-icon="mdi-form-select" title="Delete survey">
+      <v-card prepend-icon="mdi-delete" title="Delete survey">
         <v-card-text>
           <v-row dense>
             <v-col cols="12">
@@ -61,7 +61,9 @@
 
   <div class="pa-4 text-center">
     <v-dialog v-model="dialogRecovery" max-width="600" persistent>
-      <v-card prepend-icon="mdi-form-select" title="Recovey survey">
+      <v-card
+      prepend-icon="mdi-backup-restore"
+       title="Recovey survey">
         <v-card-text>
           <v-row dense>
             <v-col cols="12">

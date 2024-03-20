@@ -1,4 +1,3 @@
-// db.js
 import Dexie from 'dexie';
 // Nesse  projeto terei Survey e Form. Cada um terá suas próprias tabelas.
 // Um survey terá várias forms. Cada form estará associada a um survey.

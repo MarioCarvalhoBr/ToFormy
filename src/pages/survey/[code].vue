@@ -38,7 +38,6 @@
           <v-card-text>{{ form.street_address }}, {{ form.city }}, {{ form.state }}, {{ form.zip }}, {{ form.country
             }}</v-card-text>
 
-
           <div class="">
             <v-card-subtitle> Updated: {{ new Date(form.changed).toLocaleDateString("pt-BR") }}</v-card-subtitle>
             <v-card-subtitle> Created: {{ new Date(form.created).toLocaleDateString("pt-BR") }}</v-card-subtitle>
@@ -49,17 +48,16 @@
 
           <v-divider></v-divider>
 
-
           <v-col cols="12">
             <v-row justify="center">
-              <v-btn size="small" class="ma-2" color="blue-darken-4" icon="mdi-eye" @click="openDialogViewForm(form)"></v-btn>
-              <v-btn size="small" class="ma-2" color="orange-darken-2" icon="mdi-pencil" @click="openDialogEditForm(form)"></v-btn>
-              <v-btn size="small" class="ma-2" color="red-darken-2" icon="mdi-delete" @click="openDialogDeleteForm(form)"></v-btn>
+              <v-btn size="small" class="ma-2" color="blue-darken-4" icon="mdi-eye"
+                @click="openDialogViewForm(form)"></v-btn>
+              <v-btn size="small" class="ma-2" color="orange-darken-2" icon="mdi-pencil"
+                @click="openDialogEditForm(form)"></v-btn>
+              <v-btn size="small" class="ma-2" color="red-darken-2" icon="mdi-delete"
+                @click="openDialogDeleteForm(form)"></v-btn>
             </v-row>
           </v-col>
-
-
-
         </v-card>
       </v-col>
     </v-row>
@@ -67,7 +65,7 @@
 
   <div class="pa-4 text-center">
     <v-dialog v-model="dialog" max-width="600" persistent>
-      <v-card prepend-icon="mdi-form-select" :title="form_title">
+      <v-card prepend-icon="mdi-form-select" :title="dialog_add_title">
         <v-card-text>
           <v-row dense>
 
@@ -95,8 +93,10 @@
         <v-card-text>
           <v-row dense>
             <v-col cols="12">
-              <!--<p>Are you sure you want to delete the form '{form_delete?.name}'?</p>-->
-              <p>Are you sure you want to delete the form '{{ form_delete ? form_delete.first_name : '' }}'? <strong>This action cannot be undone.</strong></p>
+              <!--<p>Are you sure you want to delete the form '{form_to_delete?.name}'?</p>-->
+              <p>Are you sure you want to delete the form '{{ form_to_delete ? form_to_delete.first_name : '' }}'?
+                <strong>This
+                  action cannot be undone.</strong></p>
             </v-col>
           </v-row>
         </v-card-text>
@@ -125,133 +125,31 @@ import { useRoute, useRouter } from 'vue-router';
 const router = useRouter();
 const route = useRoute();
 
-const surveyJson = {
-  "locale": "en",
-  "completedHtml": {
-    "default": '<h5>Thank you for completing the form!</h5>'
-  },
-  "pages": [
-    {
-      "name": "info",
-      "elements": [
-        {
-          "defaultValue": "John",
-          "type": "text",
-          "name": "first_name",
-          "title": "What is your first name?",
-          "isRequired": true
-        },
-        {
-          "defaultValue": "Doe",
-          "type": "text",
-          "name": "last_name",
-          "title": "What is your last name?",
-          "isRequired": true
-        },
-        {
-          "defaultValue": "25-34",
-          "type": "dropdown",
-          "name": "age_range",
-          "title": "Select your age range",
-          "isRequired": true,
-          "choices": ["18-24", "25-34", "35-44", "45-54", "55-64", "65+"]
-        }
-      ],
-      "title": "Info"
-    },
-    {
-      "name": "address",
-      "elements": [
-        {
-          "defaultValue": "123 Main St",
-          "type": "text",
-          "name": "street_address",
-          "title": "What is your street address?",
-          "isRequired": true
-        },
-        {
-          "defaultValue": "Anytown",
-          "type": "text",
-          "name": "city",
-          "title": "What city do you live in?",
-          "isRequired": true
-        },
-        {
-          "defaultValue": "State 1",
-          "type": "dropdown",
-          "name": "state",
-          "title": "Select your state",
-          "isRequired": true,
-          "choices": ["State 1", "State 2", "State 3", "State 4", "State 5"] // Replace with actual state names
-        },
-        {
-          "defaultValue": "12345",
-          "type": "text",
-          "name": "zip",
-          "title": "What is your zip code?",
-          "isRequired": true
-        },
-        {
-          "defaultValue": "Country 1",
-          "type": "dropdown",
-          "name": "country",
-          "title": "Select your country",
-          "isRequired": true,
-          "choices": ["Country 1", "Country 2", "Country 3", "Country 4", "Country 5"] // Replace with actual country names
-        }
-      ],
-      "title": "Address"
-    },
-    {
-      "name": "contact",
-      "elements": [
-        {
-          "defaultValue": "john@doe.com",
-          "type": "text",
-          "name": "email",
-          "title": "What is your email address?",
-          "isRequired": true,
-          "validators": [
-            {
-              "type": "email"
-            }
-          ]
-        },
-        {
-          "defaultValue": "123-456-7890",
-          "type": "text",
-          "name": "phone",
-          "title": "What is your phone number?",
-          "isRequired": true,
-          "inputType": "tel"
-        }
-      ],
-      "title": "Contact"
-    }
-  ],
-  "showPageNumbers": true,
-  "showQuestionNumbers": "on",
-  "showProgressBar": "bottom",
-  "progressBarType": "pages",
-  "mode": "edit"
-};
+// Import survey.json
+import surveyJsonRead from '../../survey.json';
+const surveyJson = JSON.parse(JSON.stringify(surveyJsonRead));
 
 const onCompleteSurveyResults = (sender) => {
-  const results = JSON.stringify(sender.data);
-  console.log('Survey results:', results);
-  createOrUpdateFormDB(results);
+  console.log('Survey results:', sender.data);
+  createOrUpdateFormDB(sender.data);
 }
 
+// Setup SurveyJS
 const survey = new Model(surveyJson);
 survey.onComplete.add(onCompleteSurveyResults);
 
+// VARS
 const dialog = ref(false)
 const dialogDelete = ref(false)
-const form_title = ref('Create a new form')
+
+const dialog_add_title = ref('Create a new form')
 const is_edit = ref(false)
-const form_edit = ref(null)
-const form_delete = ref(null)
 const survey_code = ref(route.params.code);
+
+// Arrays
+let forms = ref([])
+const form_to_edit = ref(null)
+const form_to_delete = ref(null)
 
 const alert = ref({
   show: false,
@@ -269,12 +167,9 @@ const snackbar = ref({
   elevation: 24
 })
 
-// Arrays
-let forms = ref([])
-
 const openDialogAddForm = () => {
   dialog.value = true
-  form_title.value = 'Create a new form'
+  dialog_add_title.value = 'Create a new form'
 }
 
 // Abrar o dialog para visualizar o form completo no surveyJson. modifique o surveyJson para mostrar todos os campos e ficar não editável
@@ -295,7 +190,7 @@ const openDialogViewForm = (form) => {
 
   // Abrir o dialog de ADD com os dados do form
   dialog.value = true
-  form_title.value = 'View form'
+  dialog_add_title.value = 'View form'
   is_edit.value = false
 
 
@@ -304,14 +199,14 @@ const openDialogViewForm = (form) => {
 const openDialogEditForm = (form) => {
   console.log('View form:', form);
 
-  form_edit.value = form;
+  form_to_edit.value = form;
 
   // Setar os valores do form no surveyJson
   survey.data = form;
 
   // Abrir o dialog de ADD com os dados do form
   dialog.value = true
-  form_title.value = 'Edit form'
+  dialog_add_title.value = 'Edit form'
   is_edit.value = true
 
 
@@ -321,7 +216,7 @@ const openDialogEditForm = (form) => {
 const openDialogDeleteForm = (form) => {
   console.log('Delete form: ', form);
   dialogDelete.value = true;
-  form_delete.value = form;
+  form_to_delete.value = form;
 
 }
 
@@ -337,8 +232,6 @@ const closeDialog = () => {
 }
 
 const createOrUpdateFormDB = async (data) => {
-  // Convert string to JSON
-  data = JSON.parse(data);
   /*
   Model:
   {
@@ -368,7 +261,7 @@ const createOrUpdateFormDB = async (data) => {
   try {
     if (is_edit.value) {
       // Update the form
-      await db.form.update(form_edit.value.id, {
+      await db.form.update(form_to_edit.value.id, {
 
         name: data.first_name + ' ' + data.last_name,
 
@@ -452,14 +345,14 @@ const createSnackbar = (text, color = 'green', timeout = 3000) => {
 // Delete form
 const deleteFormDB = async () => {
   try {
-    await db.form.delete(form_delete.value.id);
-    console.log(`Form ${form_delete.value.name} successfully deleted`);
+    await db.form.delete(form_to_delete.value.id);
+    console.log(`Form ${form_to_delete.value.name} successfully deleted`);
 
     // Create snackbar
-    createSnackbar(`Form ${form_delete.value.name} successfully deleted`, 'red', 3000);
+    createSnackbar(`Form ${form_to_delete.value.name} successfully deleted`, 'red', 3000);
 
   } catch (error) {
-    let text = `Failed to delete ${form_delete.value.name}: ${error}`;
+    let text = `Failed to delete ${form_to_delete.value.name}: ${error}`;
     createAlert(text, 'error', 'Error', 'mdi-alert');
     console.log(text);
   }

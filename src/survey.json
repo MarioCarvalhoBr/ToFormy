@@ -1,0 +1,110 @@
+{
+    "locale": "en",
+    "completedHtml": {
+      "default": '<h5>Thank you for completing the form!</h5>'
+    },
+    "pages": [
+      {
+        "name": "info",
+        "elements": [
+          {
+            "defaultValue": "John",
+            "type": "text",
+            "name": "first_name",
+            "title": "What is your first name?",
+            "isRequired": true
+          },
+          {
+            "defaultValue": "Doe",
+            "type": "text",
+            "name": "last_name",
+            "title": "What is your last name?",
+            "isRequired": true
+          },
+          {
+            "defaultValue": "25-34",
+            "type": "dropdown",
+            "name": "age_range",
+            "title": "Select your age range",
+            "isRequired": true,
+            "choices": ["18-24", "25-34", "35-44", "45-54", "55-64", "65+"]
+          }
+        ],
+        "title": "Info"
+      },
+      {
+        "name": "address",
+        "elements": [
+          {
+            "defaultValue": "123 Main St",
+            "type": "text",
+            "name": "street_address",
+            "title": "What is your street address?",
+            "isRequired": true
+          },
+          {
+            "defaultValue": "Anytown",
+            "type": "text",
+            "name": "city",
+            "title": "What city do you live in?",
+            "isRequired": true
+          },
+          {
+            "defaultValue": "State 1",
+            "type": "dropdown",
+            "name": "state",
+            "title": "Select your state",
+            "isRequired": true,
+            "choices": ["State 1", "State 2", "State 3", "State 4", "State 5"] // Replace with actual state names
+          },
+          {
+            "defaultValue": "12345",
+            "type": "text",
+            "name": "zip",
+            "title": "What is your zip code?",
+            "isRequired": true
+          },
+          {
+            "defaultValue": "Country 1",
+            "type": "dropdown",
+            "name": "country",
+            "title": "Select your country",
+            "isRequired": true,
+            "choices": ["Country 1", "Country 2", "Country 3", "Country 4", "Country 5"] // Replace with actual country names
+          }
+        ],
+        "title": "Address"
+      },
+      {
+        "name": "contact",
+        "elements": [
+          {
+            "defaultValue": "john@doe.com",
+            "type": "text",
+            "name": "email",
+            "title": "What is your email address?",
+            "isRequired": true,
+            "validators": [
+              {
+                "type": "email"
+              }
+            ]
+          },
+          {
+            "defaultValue": "123-456-7890",
+            "type": "text",
+            "name": "phone",
+            "title": "What is your phone number?",
+            "isRequired": true,
+            "inputType": "tel"
+          }
+        ],
+        "title": "Contact"
+      }
+    ],
+    "showPageNumbers": true,
+    "showQuestionNumbers": "on",
+    "showProgressBar": "bottom",
+    "progressBarType": "pages",
+    "mode": "edit"
+  };

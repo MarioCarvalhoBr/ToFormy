@@ -5,21 +5,9 @@
       <v-btn color="primary" size="small" @click="openDialogAddForm">New Form</v-btn>
     </div>
 
-    <div v-if="forms.length === 0" class="text-center">
-      <br>
-      <v-divider></v-divider>
-      <br>
-      <h4>No forms found</h4>
-      <p>Click on the 'New Form' button to create a new form</p>
-    </div>
-
-    <my-snackbar-component ref="mySnackbar"></my-snackbar-component>
+    <!-- My Components -->
     <my-alert-component ref="myAlert"></my-alert-component>
-    <my-dialog-component ref="myDialogDelete" @confirm="confirmDialogDelete"
-      @close="closeDialogDelete"></my-dialog-component>
-    <my-dialog-survey-component ref="myDialogSurvey" @close="closeDialogSurvey"></my-dialog-survey-component>
 
-    <br>
     <v-row>
       <v-col v-for="form in forms" :key="form.id" cols="12" md="6" lg="3">
         <v-card class="elevation-8" color="primary" dark>
@@ -46,6 +34,12 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- My Components -->
+    <my-snackbar-component ref="mySnackbar"></my-snackbar-component>
+    <my-dialog-component ref="myDialogDelete" @confirm="confirmDialogDelete"
+      @close="closeDialogDelete"></my-dialog-component>
+    <my-dialog-survey-component ref="myDialogSurvey" @close="closeDialogSurvey"></my-dialog-survey-component>
   </div>
 
 </template>
@@ -209,6 +203,13 @@ const getAllForms = async (survey_code) => {
   try {
     forms.value = await readAllFormsDB(survey_code);
     forms.value.sort((a, b) => b.id - a.id);
+
+    // Verifica se o forms está vazio
+    if (forms.value.length === 0) {
+      myAlert.value.createAlert('No forms found', 'Click on the "New Form" button to create a new form', 'info', 'mdi-information');
+    }else{
+      myAlert.value.alert.show = false;
+    }
 
     console.log(`Loaded ${forms.value.length} forms`);
   } catch (error) {

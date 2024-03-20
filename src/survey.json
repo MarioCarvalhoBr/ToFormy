@@ -1,7 +1,7 @@
 {
     "locale": "en",
     "completedHtml": {
-      "default": '<h5>Thank you for completing the form!</h5>'
+      "default": "<h5>Thank you for completing the form!</h5>"
     },
     "pages": [
       {
@@ -55,7 +55,7 @@
             "name": "state",
             "title": "Select your state",
             "isRequired": true,
-            "choices": ["State 1", "State 2", "State 3", "State 4", "State 5"] // Replace with actual state names
+            "choices": ["State 1", "State 2", "State 3", "State 4", "State 5"]
           },
           {
             "defaultValue": "12345",
@@ -70,7 +70,7 @@
             "name": "country",
             "title": "Select your country",
             "isRequired": true,
-            "choices": ["Country 1", "Country 2", "Country 3", "Country 4", "Country 5"] // Replace with actual country names
+            "choices": ["Country 1", "Country 2", "Country 3", "Country 4", "Country 5"]
           }
         ],
         "title": "Address"
@@ -107,4 +107,4 @@
     "showProgressBar": "bottom",
     "progressBarType": "pages",
     "mode": "edit"
-  };
+  }

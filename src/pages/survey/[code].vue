@@ -13,23 +13,9 @@
       <p>Click on the 'New Form' button to create a new form</p>
     </div>
 
-    <div class="text-center">
-      <v-snackbar v-model="snackbar.show" :timeout="snackbar.timeout" :color="snackbar.color"
-        :elevation="snackbar.elevation">
-        {{ snackbar.text }}
+    <my-snackbar-component ref="mySnackbar"></my-snackbar-component>
+    <my-alert-component ref="myAlert"></my-alert-component>
 
-        <template v-slot:actions>
-          <v-btn color="white" variant="text" @click="snackbar.show = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </template>
-      </v-snackbar>
-    </div>
-
-    <v-alert v-if="alert.show" closable :type="alert.type" dismissible transition="scale-transition" :icon="alert.icon">
-      <strong>{{ alert.title }}</strong>
-      <br>{{ alert.message }}
-    </v-alert>
     <br>
     <v-row>
       <v-col v-for="form in forms" :key="form.id" cols="12" md="6" lg="3">
@@ -64,8 +50,8 @@
   </div>
 
   <div class="pa-4 text-center">
-    <v-dialog v-model="dialog" max-width="600" persistent>
-      <v-card prepend-icon="mdi-form-select" :title="dialog_add_title">
+    <v-dialog v-model="dialogBoxCreateEditView.show" max-width="600" persistent>
+      <v-card :prepend-icon="dialogBoxCreateEditView.icon" :title="dialogBoxCreateEditView.title">
         <v-card-text>
           <v-row dense>
 
@@ -88,15 +74,12 @@
   </div>
 
   <div class="pa-4 text-center">
-    <v-dialog v-model="dialogDelete" max-width="600" persistent>
-      <v-card prepend-icon="mdi-form-select" title="Delete form">
+    <v-dialog v-model="dialogBoxDelete.show" max-width="600" persistent>
+      <v-card :prepend-icon="dialogBoxDelete.icon" :title="dialogBoxDelete.title">
         <v-card-text>
           <v-row dense>
             <v-col cols="12">
-              <!--<p>Are you sure you want to delete the form '{form_to_delete?.name}'?</p>-->
-              <p>Are you sure you want to delete the form '{{ form_to_delete ? form_to_delete.first_name : '' }}'?
-                <strong>This
-                  action cannot be undone.</strong></p>
+              <p>{{ dialogBoxDelete.message }} <strong>This action cannot be undone.</strong></p>
             </v-col>
           </v-row>
         </v-card-text>
@@ -114,23 +97,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+// Imports de bibliotecas externas
+import { ref, onMounted, defineComponent } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+
+import { v4 as uuid } from 'uuid';
 import 'survey-core/defaultV2.min.css';
 import { Model } from 'survey-core';
 
-import { v4 as uuid } from 'uuid';
-import { db } from '../../db';
 
-import { useRoute, useRouter } from 'vue-router';
+// Imports relativos (de outros arquivos do projeto)
+import { db } from '../../db';
+import surveyJsonRead from '../../survey.json';
+
+// Lógica de inicialização e atribuições
 const router = useRouter();
 const route = useRoute();
-
-// Import survey.json
-import surveyJsonRead from '../../survey.json';
-const surveyJson = JSON.parse(JSON.stringify(surveyJsonRead));
+const surveyJson = surveyJsonRead;
 
 const onCompleteSurveyResults = (sender) => {
-  console.log('Survey results:', sender.data);
+  console.log('onCompleteSurveyResults:', JSON.stringify(sender.data, null, 3));
   createOrUpdateFormDB(sender.data);
 }
 
@@ -138,99 +124,106 @@ const onCompleteSurveyResults = (sender) => {
 const survey = new Model(surveyJson);
 survey.onComplete.add(onCompleteSurveyResults);
 
-// VARS
-const dialog = ref(false)
-const dialogDelete = ref(false)
+// Components
+import MySnackbarComponent from '../../components/MySnackbarComponent.vue';
+import MyAlertComponent from '../../components/MyAlertComponent.vue';
 
-const dialog_add_title = ref('Create a new form')
+
+// Uso de componente
+const mySnackbar = ref(defineComponent(MySnackbarComponent));
+const myAlert = ref(defineComponent(MyAlertComponent));
+
+
+// VARS
 const is_edit = ref(false)
 const survey_code = ref(route.params.code);
 
 // Arrays
 let forms = ref([])
-const form_to_edit = ref(null)
-const form_to_delete = ref(null)
+const form_to_edit = ref([])
+const form_to_delete = ref([])
 
-const alert = ref({
+const dialogBoxCreateEditView = ref({
   show: false,
-  message: '',
-  type: 'success',
-  title: 'Alert title',
-  icon: 'mdi-check-circle'
+  title: 'Dialog title',
+  message: 'Dialog message',
+  color: 'primary',
+  icon: 'mdi-information'
 })
 
-const snackbar = ref({
+const dialogBoxDelete = ref({
   show: false,
-  text: 'Text snackbar',
-  color: 'success',
-  timeout: 3000,
-  elevation: 24
+  title: 'Dialog title',
+  message: 'Dialog message',
+  color: 'primary',
+  icon: 'mdi-information'
 })
 
-const openDialogAddForm = () => {
-  dialog.value = true
-  dialog_add_title.value = 'Create a new form'
+// Create dialog box function
+const createDialogBox = (dialog, title, message, color = 'primary', icon = 'mdi-information') => {
+  dialog.value.show = true;
+  dialog.value.title = title;
+  dialog.value.message = message;
+  dialog.value.color = color;
+  dialog.value.icon = icon;
 }
 
-// Abrar o dialog para visualizar o form completo no surveyJson. modifique o surveyJson para mostrar todos os campos e ficar não editável
+// Functions to utilize the dialog component
+// Function to open the dialog to create a new form
+const openDialogAddForm = () => {
+  createDialogBox(dialogBoxCreateEditView, 'Create a new form', 'Create a new form', 'primary', 'mdi-account');
+}
+// Function to open the dialog to view the form
 const openDialogViewForm = (form) => {
   console.log('View form:', form);
 
-  // Setar os valores do form no surveyJson
-  survey.data = form;
-
-  // Desabilitar a paginação
-  survey.showProgressBar = 'none';
-
-  // Desabilitar o survey
-  survey.mode = 'display';
-
-  // Deixar o texto das repostas em negrito
-  survey.completedHtml = '<h5><strong>Thank you for completing the form!</strong></h5>';
-
-  // Abrir o dialog de ADD com os dados do form
-  dialog.value = true
-  dialog_add_title.value = 'View form'
   is_edit.value = false
 
+  // Setup SurveyJS
+  survey.data = form;
+  survey.showProgressBar = 'none';
+  survey.mode = 'display';
+  survey.completedHtml = '<h5><strong>Thank you for completing the form!</strong></h5>';
 
+  // Creating the dialog
+  createDialogBox(dialogBoxCreateEditView, 'View form', 'View form', 'primary', 'mdi-eye');
 }
-
+// Function to open the dialog to edit the form
 const openDialogEditForm = (form) => {
-  console.log('View form:', form);
+  console.log('openDialogEditForm to form:', JSON.stringify(form, null, 3));
 
+  // Edit mode
+  is_edit.value = true
   form_to_edit.value = form;
 
-  // Setar os valores do form no surveyJson
+  // Setup SurveyJS
   survey.data = form;
 
-  // Abrir o dialog de ADD com os dados do form
-  dialog.value = true
-  dialog_add_title.value = 'Edit form'
-  is_edit.value = true
-
-
+  // Creating the dialog
+  createDialogBox(dialogBoxCreateEditView, 'Edit form', 'Edit form', 'primary', 'mdi-pencil');
 }
-
-// openDialogDeleteForm(form)
+// Function to open the dialog to delete the form
 const openDialogDeleteForm = (form) => {
-  console.log('Delete form: ', form);
-  dialogDelete.value = true;
+  console.log('openDialogDeleteForm to form:', JSON.stringify(form, null, 3));
+  // Remove mode
   form_to_delete.value = form;
 
+  // Creating the dialog
+  createDialogBox(dialogBoxDelete, 'Delete form', `Are you sure you want to delete the form '${form.name}'?`, 'error', 'mdi-delete');
 }
-
+// Function to close the dialog
 const closeDialog = () => {
-
   // Resetar o survey
   survey.clear();
 
-  dialog.value = false;
-  dialogDelete.value = false;
+  dialogBoxCreateEditView.value.show = false;
+  dialogBoxDelete.value.show = false;
 
-  loadForms();
+  loadFormsDB();
 }
 
+// formDAO.js
+// Create or update form in IndexedDB
 const createOrUpdateFormDB = async (data) => {
   /*
   Model:
@@ -259,6 +252,7 @@ const createOrUpdateFormDB = async (data) => {
   }
   */
   try {
+    let color = 'green';
     if (is_edit.value) {
       // Update the form
       await db.form.update(form_to_edit.value.id, {
@@ -282,6 +276,7 @@ const createOrUpdateFormDB = async (data) => {
       });
 
       console.log(`Form ${data.first_name} successfully updated`);
+      color = 'blue-darken-4';
     } else {
       // Add the new form:   form: '++id, survey_code, code, name, created, changed, active' + model
       const id = await db.form.add({
@@ -309,73 +304,51 @@ const createOrUpdateFormDB = async (data) => {
 
       console.log(`Form ${data.first_name} successfully added. Got id ${id}`);
     }
-
     // Show alert
     let message = `Form ${data.first_name} successfully ${is_edit.value ? 'updated' : 'added'}`;
-    createSnackbar(message, 'green', 3000);
+    mySnackbar.value.createSnackbar(message, color, 3000);
 
     // Reload forms
-    loadForms();
+    loadFormsDB();
   } catch (error) {
     let text = `Failed to add ${data.first_name}: ${error}`;
-    createAlert(text, 'error', 'Error', 'mdi-alert');
+    myAlert.value.createAlert('Error', text, 'error', 'mdi-alert');
     console.log(text);
   }
 }
-// createAlert
-const createAlert = (message, type, title, icon = 'mdi-alert') => {
-  alert.value.message = message;
-  alert.value.type = type;
-  alert.value.title = title;
-  alert.value.icon = icon;
-  alert.value.show = true;
-
-  setTimeout(() => {
-    alert.value.show = false;
-  }, 5000);
-}
-
-//createSnackbar
-const createSnackbar = (text, color = 'green', timeout = 3000) => {
-  snackbar.value.text = text;
-  snackbar.value.color = color;
-  snackbar.value.timeout = timeout;
-  snackbar.value.show = true;
-}
-// Delete form
+// Delete form from IndexedDB
 const deleteFormDB = async () => {
   try {
     await db.form.delete(form_to_delete.value.id);
     console.log(`Form ${form_to_delete.value.name} successfully deleted`);
 
     // Create snackbar
-    createSnackbar(`Form ${form_to_delete.value.name} successfully deleted`, 'red', 3000);
+    mySnackbar.value.createSnackbar(`Form ${form_to_delete.value.name} successfully deleted`, 'red-darken-4', 3000);
 
   } catch (error) {
     let text = `Failed to delete ${form_to_delete.value.name}: ${error}`;
-    createAlert(text, 'error', 'Error', 'mdi-alert');
+    myAlert.value.createAlert('Error', text, 'error', 'mdi-alert');
     console.log(text);
   }
 
   closeDialog();
 }
-
-// Método onMounted
-const loadForms = async () => {
+// Load forms from IndexedDB
+const loadFormsDB = async () => {
   try {
     // Busca todos os forms que tem o survey_code and active = true
     forms.value = await db.form.where('survey_code').equals(survey_code.value).and(form => form.active === 1).toArray();
     // ORdenar por id decrescente
     forms.value.sort((a, b) => b.id - a.id);
     console.log(`Loaded ${forms.value.length} forms`);
-    console.log('Forms:', forms.value[0]);
   } catch (error) {
-    console.log(`Failed to load forms: ${error}`);
+    let text = `Failed to load forms: ${error}`;
+    myAlert.value.createAlert('Error', text, 'error', 'mdi-alert');
+    console.log(text);
   }
 }
-
-// Function verify if survey_code exists in IndexedDB
-const verifySurveyId = async () => {
+// Search survey by id in IndexedDB
+const verifySurveyIdDB = async () => {
   console.log('Survey id:', survey_code.value);
   // Busca o survey pelo id
   const survey_search = await db.survey.where('code').equals(survey_code.value).toArray();
@@ -384,15 +357,14 @@ const verifySurveyId = async () => {
     router.push('/');
   } else {
     console.log('Survey found:', survey_search[0]);
-    loadForms();
+    loadFormsDB();
   }
 }
 
-// lifecycle hooks
+// Lifecycle hooks
 onMounted(async () => {
   console.log('onMounted');
-  verifySurveyId();
-
+  verifySurveyIdDB();
 })
 
 </script>

@@ -52,7 +52,7 @@
 
           <v-col cols="12">
             <v-row justify="center">
-              <v-btn size="small" class="ma-2" color="blue-darken-4" icon="mdi-eye" @click="() => $router.push('/form/' + form.code)"></v-btn>
+              <v-btn size="small" class="ma-2" color="blue-darken-4" icon="mdi-eye" @click="openDialogViewForm(form)"></v-btn>
               <v-btn size="small" class="ma-2" color="orange-darken-2" icon="mdi-pencil" @click="openDialogEditForm(form)"></v-btn>
               <v-btn size="small" class="ma-2" color="red-darken-2" icon="mdi-delete" @click="openDialogDeleteForm(form)"></v-btn>
             </v-row>
@@ -251,8 +251,6 @@ const form_title = ref('Create a new form')
 const is_edit = ref(false)
 const form_edit = ref(null)
 const form_delete = ref(null)
-const formName = ref('')
-const formDescription = ref('')
 const survey_code = ref(route.params.code);
 
 const alert = ref({
@@ -279,15 +277,43 @@ const openDialogAddForm = () => {
   form_title.value = 'Create a new form'
 }
 
-const openDialogEditForm = (form) => {
+// Abrar o dialog para visualizar o form completo no surveyJson. modifique o surveyJson para mostrar todos os campos e ficar não editável
+const openDialogViewForm = (form) => {
+  console.log('View form:', form);
+
+  // Setar os valores do form no surveyJson
+  survey.data = form;
+
+  // Desabilitar a paginação
+  survey.showProgressBar = 'none';
+
+  // Desabilitar o survey
+  survey.mode = 'display';
+
+  // Deixar o texto das repostas em negrito
+  survey.completedHtml = '<h5><strong>Thank you for completing the form!</strong></h5>';
+
+  // Abrir o dialog de ADD com os dados do form
   dialog.value = true
-  // Change form title
+  form_title.value = 'View form'
+  is_edit.value = false
+
+
+}
+
+const openDialogEditForm = (form) => {
+  console.log('View form:', form);
+
+  form_edit.value = form;
+
+  // Setar os valores do form no surveyJson
+  survey.data = form;
+
+  // Abrir o dialog de ADD com os dados do form
+  dialog.value = true
   form_title.value = 'Edit form'
   is_edit.value = true
-  form_edit.value = form
 
-  formName.value = form.name
-  formDescription.value = form.description
 
 }
 
@@ -362,7 +388,7 @@ const createOrUpdateFormDB = async (data) => {
         changed: new Date(),
       });
 
-      console.log(`Form ${formName.value} successfully updated`);
+      console.log(`Form ${data.first_name} successfully updated`);
     } else {
       // Add the new form:   form: '++id, survey_code, code, name, created, changed, active' + model
       const id = await db.form.add({
@@ -388,17 +414,17 @@ const createOrUpdateFormDB = async (data) => {
         active: 1,
       });
 
-      console.log(`Form ${formName.value} successfully added. Got id ${id}`);
+      console.log(`Form ${data.first_name} successfully added. Got id ${id}`);
     }
 
     // Show alert
-    let message = `Form ${formName.value} successfully ${is_edit.value ? 'updated' : 'added'}`;
+    let message = `Form ${data.first_name} successfully ${is_edit.value ? 'updated' : 'added'}`;
     createSnackbar(message, 'green', 3000);
 
     // Reload forms
     loadForms();
   } catch (error) {
-    let text = `Failed to add ${formName.value}: ${error}`;
+    let text = `Failed to add ${data.first_name}: ${error}`;
     createAlert(text, 'error', 'Error', 'mdi-alert');
     console.log(text);
   }
@@ -446,6 +472,8 @@ const loadForms = async () => {
   try {
     // Busca todos os forms que tem o survey_code and active = true
     forms.value = await db.form.where('survey_code').equals(survey_code.value).and(form => form.active === 1).toArray();
+    // ORdenar por id decrescente
+    forms.value.sort((a, b) => b.id - a.id);
     console.log(`Loaded ${forms.value.length} forms`);
     console.log('Forms:', forms.value[0]);
   } catch (error) {

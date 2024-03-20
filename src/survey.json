@@ -1,7 +1,7 @@
 {
     "locale": "en",
     "completedHtml": {
-      "default": "<h5>Thank you for completing the form!</h5>"
+      "default": "<h5>Response registered</h5><p>Thank you for completing the survey</p>"
     },
     "pages": [
       {

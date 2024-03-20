@@ -22,20 +22,15 @@
     <v-row>
       <v-col v-for="form in forms" :key="form.id" cols="12" md="6" lg="3">
         <v-card class="elevation-8" color="primary" dark>
-          <v-card-title>{{ form.first_name }} {{ form.last_name }}</v-card-title>
-          <v-card-text>{{ form.street_address }}, {{ form.city }}, {{ form.state }}, {{ form.zip }}, {{ form.country
+          <v-card-title>{{ form.data.first_name }} {{ form.data.last_name }}</v-card-title>
+          <v-card-text>{{ form.data.street_address }}, {{ form.data.city }}, {{ form.data.state }}, {{ form.data.zip }}, {{ form.data.country
             }}</v-card-text>
-
           <div class="">
             <v-card-subtitle> Updated: {{ new Date(form.changed).toLocaleDateString("pt-BR") }}</v-card-subtitle>
             <v-card-subtitle> Created: {{ new Date(form.created).toLocaleDateString("pt-BR") }}</v-card-subtitle>
-
           </div>
-
           <br>
-
           <v-divider></v-divider>
-
           <v-col cols="12">
             <v-row justify="center">
               <v-btn size="small" class="ma-2" color="blue-darken-4" icon="mdi-eye"
@@ -75,6 +70,8 @@ const surveyJson = surveyJsonRead;
 const onCompleteSurveyResults = (sender) => {
   console.log('onCompleteSurveyResults:', JSON.stringify(sender.data, null, 3));
   createOrUpdateFormDB(sender.data);
+  // Reload forms
+  loadFormsDB();
 }
 
 // Setup SurveyJS
@@ -100,8 +97,8 @@ const survey_code = ref(route.params.code);
 
 // Arrays
 let forms = ref([])
-const form_to_edit = ref([])
-const form_to_delete = ref([])
+const form_to_edit = ref(null)
+const form_to_delete = ref(null)
 
 // DELETE: Functions and methods to utilize the dialog component
 const openDialogDeleteForm = (form) => {
@@ -111,29 +108,28 @@ const openDialogDeleteForm = (form) => {
 }
 const closeDialogDelete = () => {
   console.log('Closed from MyDialogComponent');
-  // loadFormsDB();
 };
 const confirmDialogDelete = () => {
   console.log('Confirmed from MyDialogComponent');
   deleteFormDB();
+  loadFormsDB();
 };
 
 // SURVEY: Functions and methods to utilize the dialog component
-// Function to open the dialog to create a new form
 const openDialogAddForm = () => {
   // Clear the survey
   survey.clear();
   survey.mode = 'edit';
+  survey.showProgressBar = 'bottom';
   // Edit mode
   is_edit.value = false
 
   myDialogSurvey.value.createDialog('New form', 'New form', 'primary', 'mdi-plus', survey);
 }
-// Function to open the dialog to view the form
 const openDialogViewForm = (form) => {
   console.log('View form:', form);
   // Setup SurveyJS
-  survey.data = form;
+  survey.data = form.data;
   survey.showProgressBar = 'none';
   survey.mode = 'display';
   // View mode
@@ -141,13 +137,7 @@ const openDialogViewForm = (form) => {
 
   myDialogSurvey.value.createDialog('View form', 'View form', 'primary', 'mdi-eye', survey);
 }
-
-// Function to open the dialog to edit the form
 const openDialogEditForm = (form) => {
-  // Clear the survey
-  survey.clear();
-  survey.mode = 'edit';
-
   console.log('openDialogEditForm to form:', JSON.stringify(form, null, 3));
 
   // Edit mode
@@ -155,12 +145,14 @@ const openDialogEditForm = (form) => {
   form_to_edit.value = form;
 
   // Setup SurveyJS
-  survey.data = form;
+  survey.clear();
+  survey.data = form.data;
+  survey.mode = 'edit';
+  survey.showProgressBar = 'bottom';
 
   // Create the dialog
   myDialogSurvey.value.createDialog('Edit form', 'Edit form', 'primary', 'mdi-pencil', survey);
 }
-
 const closeDialogSurvey = () => {
   console.log('Closed from MyDialogSurveyComponent');
   // Clear the survey
@@ -170,54 +162,19 @@ const closeDialogSurvey = () => {
 // formDAO.js
 // Create or update form in IndexedDB
 const createOrUpdateFormDB = async (data) => {
-  /*
-  Model:
-  {
-    "id": 0,
-    "survey_code": 0,
-    "code": 0,
-    "name": "Form",
-
-    "first_name": "John",
-    "last_name": "Doe",
-    "age_range": 0,
-
-    "street_address": "123 Main St",
-    "city": "Anytown",
-    "state": "CA",
-    "zip": "12345",
-    "country": "USA",
-
-    "email": "",
-    "phone": "123-456-7890",
-
-    "created": "2017-01-01",
-    "changed": "2017-01-01",
-    "active": true
-  }
-  */
   try {
     let color = 'green';
     if (is_edit.value) {
       // Update the form
       await db.form.update(form_to_edit.value.id, {
-
+        // Data identification
         name: data.first_name + ' ' + data.last_name,
 
-        first_name: data.first_name,
-        last_name: data.last_name,
-        age_range: data.age_range,
-
-        street_address: data.street_address,
-        city: data.city,
-        state: data.state,
-        zip: data.zip,
-        country: data.country,
-
-        email: data.email,
-        phone: data.phone,
-
+        // Data temporal
         changed: new Date(),
+
+        // Data model
+        data: data,
       });
 
       console.log(`Form ${data.first_name} successfully updated`);
@@ -225,26 +182,19 @@ const createOrUpdateFormDB = async (data) => {
     } else {
       // Add the new form:   form: '++id, survey_code, code, name, created, changed, active' + model
       const id = await db.form.add({
+        // Data identification
         survey_code: survey_code.value,
         code: uuid(),
         name: data.first_name + ' ' + data.last_name,
 
-        first_name: data.first_name,
-        last_name: data.last_name,
-        age_range: data.age_range,
-
-        street_address: data.street_address,
-        city: data.city,
-        state: data.state,
-        zip: data.zip,
-        country: data.country,
-
-        email: data.email,
-        phone: data.phone,
-
+        // Data temporal
         created: new Date(),
         changed: new Date(),
         active: 1,
+
+        // Data model
+        data: data,
+
       });
 
       console.log(`Form ${data.first_name} successfully added. Got id ${id}`);
@@ -253,8 +203,6 @@ const createOrUpdateFormDB = async (data) => {
     let message = `Form ${data.first_name} successfully ${is_edit.value ? 'updated' : 'added'}`;
     mySnackbar.value.createSnackbar(message, color, 3000);
 
-    // Reload forms
-    loadFormsDB();
   } catch (error) {
     let text = `Failed to add ${data.first_name}: ${error}`;
     myAlert.value.createAlert('Error', text, 'error', 'mdi-alert');
@@ -269,7 +217,6 @@ const deleteFormDB = async () => {
 
     // Create snackbar
     mySnackbar.value.createSnackbar(`Form ${form_to_delete.value.name} successfully deleted`, 'red-darken-4', 3000);
-
   } catch (error) {
     let text = `Failed to delete ${form_to_delete.value.name}: ${error}`;
     myAlert.value.createAlert('Error', text, 'error', 'mdi-alert');
@@ -292,7 +239,7 @@ const loadFormsDB = async () => {
 }
 // Search survey by id in IndexedDB
 const verifySurveyIdDB = async () => {
-  console.log('Survey id:', survey_code.value);
+  console.log('verifySurveyIdDB survey_code:', survey_code.value);
   // Busca o survey pelo id
   const survey_search = await db.survey.where('code').equals(survey_code.value).toArray();
   if (survey_search.length === 0) {
@@ -300,7 +247,6 @@ const verifySurveyIdDB = async () => {
     router.push('/');
   } else {
     console.log('Survey found:', survey_search[0]);
-    loadFormsDB();
   }
 }
 
@@ -308,6 +254,9 @@ const verifySurveyIdDB = async () => {
 onMounted(async () => {
   console.log('onMounted');
   verifySurveyIdDB();
+
+  loadFormsDB();
+
 })
 
 onUpdated(() => {

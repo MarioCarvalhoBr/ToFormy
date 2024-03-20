@@ -30,10 +30,35 @@ export function updateSurveyDB(id, data) {
   });
 }
 // deleteSurveyDB
-export function deleteSurveyDB(id) {
-  return db.survey.delete(id);
+export function deleteSurveyDB(survey) {
+  // Remova from database o survey com o id e também todos os forms que tem survey_code igual ao survey.code
+  return db.transaction('rw', db.survey, db.form, async () => {
+    await db.survey.delete(survey.id);
+    await db.form.where('survey_code').equals(survey.code).delete();
+  });
 }
+
 // readAllSurveysDB
 export function readAllSurveysDB() {
   return db.survey.where('active').equals(1).toArray();
+}
+
+export function readAllArchivedSurveysDB() {
+  return db.survey.where('active').equals(0).toArray();
+}
+
+// setArchiveSurveyDB
+export function setActiveSurveyDB(id) {
+  return db.survey.update(id, {
+    active: 1,
+    changed: new Date(),
+  });
+}
+
+// setInactiveSurveyDB
+export function setInactiveSurveyDB(id) {
+  return db.survey.update(id, {
+    active: 0,
+    changed: new Date(),
+  });
 }

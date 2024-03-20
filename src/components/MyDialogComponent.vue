@@ -14,9 +14,14 @@
         <v-card-actions>
           <v-spacer></v-spacer>
 
-          <v-btn :text="dialog.buttons.cancel" variant="plain" @click="closeDialog"></v-btn>
-          <v-btn :text="dialog.buttons.confirm" :color="dialog.color_buttons.confirm" variant="tonal"
-            @click="confirmDialog()"></v-btn>
+          <v-btn :text="dialog.buttons.cancel" class="text-white flex-grow-1 text-none" :color="dialog.color_buttons.cancel" rounded="0" variant="flat"
+            @click="closeDialog()">
+          </v-btn>
+
+          <v-btn :text="dialog.buttons.confirm" class="text-white flex-grow-1 text-none" :color="dialog.color_buttons.confirm" rounded="0" variant="flat"
+            @click="confirmDialog()">
+          </v-btn>
+          <br>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -40,12 +45,12 @@ export default {
         cancel: 'Close',
       },
       color_buttons: {
-        confirm: 'red',
+        confirm: 'grey-darken-4',
         cancel: 'grey',
       },
     });
 
-    const createDialog = (title, message, color, icon, buttons = { confirm: 'OK', cancel: 'Close' }, color_buttons = { confirm: 'primary', cancel: 'grey' }) => {
+    const createDialog = (title, message, color, icon, buttons = { confirm: 'OK', cancel: 'Close' }, color_buttons = { confirm: 'grey-darken-4', cancel: 'grey' }) => {
       dialog.value.title = title;
       dialog.value.message = message;
       dialog.value.color = color;

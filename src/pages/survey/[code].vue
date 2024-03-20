@@ -40,6 +40,7 @@
     <my-dialog-component ref="myDialogDelete" @confirm="confirmDialogDelete"
       @close="closeDialogDelete"></my-dialog-component>
     <my-dialog-survey-component ref="myDialogSurvey" @close="closeDialogSurvey"></my-dialog-survey-component>
+
   </div>
 
 </template>
@@ -60,7 +61,7 @@ import MyDialogComponent from '@/components/MyDialogComponent.vue';
 import MyDialogSurveyComponent from '@/components/MyDialogSurveyComponent.vue';
 
 // Imports relativos (de outros arquivos do projeto)
-import surveyJson from '../../survey.json';
+import surveyJson from '../../model_survey_form.json';
 import { createFormDB, updateFormDB, deleteFormDB, readAllFormsDB } from '../../database/formDAO';
 import { getByCodeSurveyDB } from '../../database/surveyDAO';
 

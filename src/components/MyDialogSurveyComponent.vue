@@ -17,7 +17,12 @@
         <v-card-actions>
           <v-spacer></v-spacer>
 
-          <v-btn text="Close" variant="plain" @click="closeDialog"></v-btn>
+          <v-btn class="text-white flex-grow-1 text-none" color="grey-darken-4" rounded="0" variant="flat"
+            @click="closeDialog">
+            Close
+          </v-btn>
+          <br>
+
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -39,7 +44,7 @@ export default {
       survey: null,
     });
 
-    const createDialog = (title, message, color="primary", icon, survey) => {
+    const createDialog = (title, message, color = "primary", icon, survey) => {
       dialog.value.title = title;
       dialog.value.message = message;
       dialog.value.color = color;

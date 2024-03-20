@@ -1,0 +1,56 @@
+{
+    "locale": "en",
+    "completedHtml": {
+      "default": "<h5>Response registered</h5><p>Thank you for completing the survey</p>"
+    },
+    "pages": [
+      {
+        "name": "info",
+        "elements": [
+          {
+            "defaultValue": "Survey 1",
+            "type": "text",
+            "name": "name",
+            "title": "Survey name",
+            "isRequired": true
+          },
+          {
+            "type": "comment",
+            "name": "description",
+            "title": "Survey description",
+            "placeholder": "Please enter a description of the survey",
+            "isRequired": true
+          },
+          {
+            "defaultValue": "Anytown",
+            "type": "text",
+            "name": "city",
+            "title": "City",
+            "isRequired": true
+          },
+          {
+            "defaultValue": "State 1",
+            "type": "dropdown",
+            "name": "state",
+            "title": "State",
+            "isRequired": true,
+            "choices": ["State 1", "State 2", "State 3", "State 4", "State 5"]
+          },
+          {
+            "defaultValue": "Country 1",
+            "type": "dropdown",
+            "name": "country",
+            "title": "Country",
+            "isRequired": true,
+            "choices": ["Country 1", "Country 2", "Country 3", "Country 4", "Country 5"]
+          }
+        ],
+        "title": "Info"
+      }
+    ],
+    "showPageNumbers": true,
+    "showQuestionNumbers": "on",
+    "showProgressBar": "bottom",
+    "progressBarType": "pages",
+    "mode": "edit"    
+  }

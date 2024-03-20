@@ -5,277 +5,233 @@
       <v-btn color="primary" size="small" @click="openDialogAddSurvey">New Survey</v-btn>
     </div>
 
-    <div v-if="surveys.length === 0" class="text-center">
-      <br>
-      <v-divider></v-divider>
-      <br>
-      <h4>No surveys found</h4>
-      <p>Click on the 'New Survey' button to create a new survey</p>
-    </div>
+    <!-- My Components -->
+    <my-alert-component ref="myAlert"></my-alert-component>
 
     <v-row>
       <v-col v-for="survey in surveys" :key="survey.id" cols="12" md="6" lg="3">
-        <v-card class="elevation-4" color="indigo-darken-3" dark>
-          <v-card-title>{{ survey.name }}</v-card-title>
-          <v-card-text>{{ survey.description }}</v-card-text>
-
-
+        <v-card class="elevation-8" color="primary" dark>
+          <v-card-title>{{ survey.data.name }} {{ survey.data.description }}</v-card-title>
+          <v-card-subtitle>{{ survey.data.description }}</v-card-subtitle>
+          <v-card-text>{{ survey.data.city }}, {{ survey.data.state }}, {{ survey.data.country}}</v-card-text>
           <div class="">
-            <v-card-subtitle> Updated: {{ new Date(survey.changed).toLocaleDateString() }}</v-card-subtitle>
-            <v-card-subtitle> Created: {{ new Date(survey.created).toLocaleDateString() }}</v-card-subtitle>
+            <v-card-subtitle> Updated: {{ new Date(survey.changed).toLocaleDateString("pt-BR") }}</v-card-subtitle>
+            <v-card-subtitle> Created: {{ new Date(survey.created).toLocaleDateString("pt-BR") }}</v-card-subtitle>
           </div>
           <br>
-
           <v-divider></v-divider>
-
           <v-col cols="12">
             <v-row justify="center">
-              <v-btn size="small" class="ma-2" color="blue-darken-2" icon="mdi-eye" @click="() => $router.push('/survey/' + survey.code)"></v-btn>
-              <v-btn size="small" class="ma-2" color="orange-darken-2" icon="mdi-pencil" @click="openDialogEditSurvey(survey)"></v-btn>
-              <v-btn size="small" class="ma-2" color="red-darken-2" icon="mdi-delete" @click="openDialogRemoveSurvey(survey)"></v-btn>
-              <v-btn size="small" class="ma-2" color="black-darken-2" icon="mdi-share-variant"></v-btn>
+              <v-btn size="small" class="ma-2" color="blue-darken-4" icon="mdi-eye"
+              @click="() => $router.push('/survey/' + survey.code)"></v-btn>
+              <v-btn size="small" class="ma-2" color="orange-darken-2" icon="mdi-pencil"
+                @click="openDialogEditSurvey(survey)"></v-btn>
+              <v-btn size="small" class="ma-2" color="red-darken-2" icon="mdi-delete"
+                @click="openDialogDeleteSurvey(survey)"></v-btn>
             </v-row>
           </v-col>
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- My Components -->
+    <my-snackbar-component ref="mySnackbar"></my-snackbar-component>
+    <my-dialog-component ref="myDialogDelete" @confirm="confirmDialogDelete"
+      @close="closeDialogDelete"></my-dialog-component>
+    <my-dialog-survey-component ref="myDialogSurvey" @close="closeDialogSurvey"></my-dialog-survey-component>
+
   </div>
 
-  <div class="pa-4 text-center">
-    <v-dialog v-model="dialog" max-width="600" persistent>
-      <v-card prepend-icon="mdi-form-select" :title="form_title">
-        <v-card-text>
-          <v-row dense>
-            <v-col cols="12">
-              <v-text-field label="Survey name*" v-model="surveyName" :rules="nameRules"
-                :error-messages="surveyNameError" required>
-              </v-text-field>
-            </v-col>
-
-            <v-col cols="12">
-              <v-textarea label="Survey description*" v-model="surveyDescription" :rules="descriptionRules"
-                :error-messages="surveyDescriptionError" required>
-              </v-textarea>
-            </v-col>
-          </v-row>
-
-          <small class="text-caption text-medium-emphasis">*indicates required field</small>
-        </v-card-text>
-        <v-divider></v-divider>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn text="Close" variant="plain" @click="closeDialog"></v-btn>
-          <v-btn color="primary" text="Save" variant="tonal" @click="validateForm"></v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </div>
-
-  <div class="pa-4 text-center">
-    <v-dialog v-model="dialogMoveToTrash" max-width="600" persistent>
-      <v-card prepend-icon="mdi-delete" title="Move to trash">
-        <v-card-text>
-          <v-row dense>
-            <v-col cols="12">
-              <!--<p>Are you sure you want to delete the survey '{survey_remove?.name}'?</p>-->
-              <p>Are you sure you want move to trash the survey '{{ survey_remove ? survey_remove.name : '' }}'?</p>
-            </v-col>
-          </v-row>
-        </v-card-text>
-        <v-divider></v-divider>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn text="Close" variant="plain" @click="closeDialog"></v-btn>
-          <v-btn color="error" text="Remove" variant="tonal" @click="moveSurveyToTrashDB()"></v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </div>
 </template>
 
 <script setup>
-import { v4 as uuid } from 'uuid';
-import { db } from '../../database/db';
+// Libraries
+import { ref, onMounted, defineComponent, onUpdated } from 'vue';
+import { useRouter } from 'vue-router';
 
-import { ref, onMounted } from 'vue'
+// Extra libraries
+import 'survey-core/defaultV2.min.css';
+import { Model } from 'survey-core';
 
-const dialog = ref(false)
-const dialogMoveToTrash = ref(false)
-const form_title = ref('Create a new survey')
-const is_edit = ref(false)
-const survey_edit = ref(null)
-const survey_remove = ref(null)
-const surveyName = ref('')
-const surveyDescription = ref('')
+// Components
+import MySnackbarComponent from '../../components/MySnackbarComponent.vue';
+import MyAlertComponent from '../../components/MyAlertComponent.vue';
+import MyDialogComponent from '@/components/MyDialogComponent.vue';
+import MyDialogSurveyComponent from '@/components/MyDialogSurveyComponent.vue';
 
-// Array de surveys:
+// Imports relativos (de outros arquivos do projeto)
+import surveyJson from '../../model_survey_survey.json';
+import { createSurveyDB, updateSurveyDB, deleteSurveyDB, readAllSurveysDB } from '../../database/surveyDAO';
+
+// SETUP SURVEYJS
+// -----------------------------------------------------------------------------
+const onCompleteSurveyResults = (sender) => {
+  console.log('onCompleteSurveyResults:', JSON.stringify(sender.data, null, 3));
+  createOrUpdateSurvey(sender.data);
+  getAllSurveys();
+}
+// Model SurveyJS
+const surveyModel = new Model(surveyJson);
+surveyModel.onComplete.add(onCompleteSurveyResults);
+// -----------------------------------------------------------------------------
+
+// VARIABLES AND ARRAYS
+// -----------------------------------------------------------------------------
+// Router
+const router = useRouter();
+
+// Uso de componente
+const mySnackbar = ref(defineComponent(MySnackbarComponent));
+const myAlert = ref(defineComponent(MyAlertComponent));
+const myDialogDelete = ref(defineComponent(MyDialogComponent));
+const myDialogSurvey = ref(defineComponent(MyDialogSurveyComponent));
+
+// VARS
+const is_edit_survey_dialog = ref(false)
+
+// Arrays
 let surveys = ref([])
+const survey_to_edit = ref(null)
+const survey_to_delete = ref(null)
+// -----------------------------------------------------------------------------
 
-const nameRules = [
-  v => !!v || 'Survey name is required',
-]
-const descriptionRules = [
-  v => !!v || 'Survey description is required',
-]
-
+// DIALOG FUNCTIONS
+// -----------------------------------------------------------------------------
+// DELETE: Functions and methods to utilize the dialog component
+const openDialogDeleteSurvey = (survey) => {
+  console.log('openDialogDeleteSurvey to survey:', JSON.stringify(survey, null, 3));
+  survey_to_delete.value = survey;
+  myDialogDelete.value.createDialog('Delete survey', `Are you sure you want to delete the survey '${survey.name}'? This action cannot be undone.`, 'error', 'mdi-delete', { confirm: 'Delete', cancel: 'Close' }, { confirm: 'red', cancel: 'grey' });
+}
+const closeDialogDelete = () => {
+  console.log('Closed from MyDialogComponent');
+};
+const confirmDialogDelete = () => {
+  console.log('Confirmed from MyDialogComponent');
+  deleteSurvey(survey_to_delete);
+  getAllSurveys();
+};
+// SURVEY: Functions and methods to utilize the dialog component
 const openDialogAddSurvey = () => {
-  dialog.value = true
-  form_title.value = 'Create a new survey'
+  // Clear the survey
+  surveyModel.clear();
+  surveyModel.mode = 'edit';
+  // Desativar a paginação
+  surveyModel.showProgressBar = 'none';
+  // Edit mode
+  is_edit_survey_dialog.value = false
 
-
+  myDialogSurvey.value.createDialog('New survey', 'New survey', 'primary', 'mdi-plus', surveyModel);
 }
+/*
+const openDialogViewSurvey = (survey) => {
+  console.log('View survey:', survey);
+  // Setup SurveyJS
+  surveyModel.data = survey.data;
+  surveyModel.showProgressBar = 'none';
+  surveyModel.mode = 'display';
+  // View mode
+  is_edit_survey_dialog.value = false
 
+  myDialogSurvey.value.createDialog('View survey', 'View survey', 'primary', 'mdi-eye', surveyModel);
+}
+*/
 const openDialogEditSurvey = (survey) => {
-  dialog.value = true
-  // Change form title
-  form_title.value = 'Edit survey'
-  is_edit.value = true
-  survey_edit.value = survey
+  console.log('openDialogEditSurvey to survey:', JSON.stringify(survey, null, 3));
 
-  surveyName.value = survey.name
-  surveyDescription.value = survey.description
+  // Edit mode
+  is_edit_survey_dialog.value = true
+  survey_to_edit.value = survey;
 
+  // Setup SurveyJS
+  surveyModel.clear();
+  surveyModel.data = survey.data;
+  surveyModel.mode = 'edit';
+  surveyModel.showProgressBar = 'bottom';
+
+  // Create the dialog
+  myDialogSurvey.value.createDialog('Edit survey', 'Edit survey', 'primary', 'mdi-pencil', surveyModel);
 }
+const closeDialogSurvey = () => {
+  console.log('Closed from MyDialogSurveyComponent');
+  // Clear the survey
+  surveyModel.clear();
+};
+// -----------------------------------------------------------------------------
 
-// openDialogRemoveSurvey(survey)
-const openDialogRemoveSurvey = (survey) => {
-  console.log('Move survey to trash', survey);
-  dialogMoveToTrash.value = true;
-  survey_remove.value = survey;
-
-}
-
-const closeDialog = () => {
-  resetForm();
-  dialog.value = false;
-  dialogMoveToTrash.value = false;
-
-}
-
-const surveyNameError = ref('');
-const surveyDescriptionError = ref('');
-
-const validateForm = () => {
-  let isValid = true;
-
-  if (!surveyName.value) {
-    surveyNameError.value = 'Survey name is required';
-    isValid = false;
-  } else {
-    surveyNameError.value = '';
-  }
-
-  if (!surveyDescription.value) {
-    surveyDescriptionError.value = 'Survey description is required';
-    isValid = false;
-  } else {
-    surveyDescriptionError.value = '';
-  }
-
-  if (isValid) {
-    // Prossiga com a lógica de submissão
-    console.log('Form is valid');
-    dialog.value = false;
-
-    createOrUpdateSurveyDBrveyDB();
-  }
-}
-
-// Reset form
-const resetForm = () => {
-  surveyName.value = '';
-  surveyDescription.value = '';
-  surveyNameError.value = '';
-  surveyDescriptionError.value = '';
-  is_edit.value = false;
-  survey_edit.value = null;
-  survey_remove.value = null;
-
-}
-
-
-const createOrUpdateSurveyDBrveyDB = async () => {
+// SURVEY DAO OPERATIONS
+// -----------------------------------------------------------------------------
+const createOrUpdateSurvey = async (data) => {
   try {
-    if (is_edit.value) {
-      // Update the survey
-      await db.survey.update(survey_edit.value.id, {
-        name: surveyName.value,
-        description: surveyDescription.value,
-        changed: new Date(),
-      });
+    let color = 'green';
 
-      console.log(`Survey ${surveyName.value} successfully updated`);
+    if (is_edit_survey_dialog.value) {
+      color = 'blue-darken-4';
+      // Update survey
+      await updateSurveyDB(survey_to_edit.value.id, data);
+
+      console.log(`Survey ${data.first_name} successfully updated`);
     } else {
-      // Add the new survey:   survey: 'code, name, created, changed, active',
-      const id = await db.survey.add({
-        code: uuid(),
-        name: surveyName.value,
-        description: surveyDescription.value,
-        created: new Date(),
-        changed: new Date(),
-        active: 1,
-      });
+      const id = await createSurveyDB(data);
 
-      console.log(`Survey ${surveyName.value} successfully added. Got id ${id}`);
+      console.log(`Survey ${data.first_name} successfully added. Got id ${id}`);
+    }
+    let message = `Survey ${data.first_name} successfully ${is_edit_survey_dialog.value ? 'updated' : 'added'}`;
+    mySnackbar.value.createSnackbar(message, color, 3000);
+
+  } catch (error) {
+    let text = `Failed to add ${data.first_name}: ${error}`;
+
+    myAlert.value.createAlert('Error', text, 'error', 'mdi-alert');
+    console.log(text);
+  }
+}
+const deleteSurvey = async (survey) => {
+  try {
+    await deleteSurveyDB(survey.value.id);
+
+    mySnackbar.value.createSnackbar(`Survey ${survey.value.name} successfully deleted`, 'red-darken-4', 3000);
+    console.log(`Survey ${survey.value.name} successfully deleted`);
+  } catch (error) {
+    let text = `Failed to delete ${survey.value.name}: ${error}`;
+
+    myAlert.value.createAlert('Error', text, 'error', 'mdi-alert');
+    console.log(text);
+  }
+}
+const getAllSurveys = async (survey_code) => {
+  try {
+    surveys.value = await readAllSurveysDB(survey_code);
+    surveys.value.sort((a, b) => b.id - a.id);
+
+    // Verifica se o surveys está vazio
+    if (surveys.value.length === 0) {
+      myAlert.value.createAlert('No surveys found', 'Click on the "New Survey" button to create a new survey', 'info', 'mdi-insurveyation');
+    }else{
+      myAlert.value.alert.show = false;
     }
 
-    // Reset data and close dialog
-    resetForm();
-
-    closeDialog();
-
-    // Reload surveys
-    loadSurveys();
-  } catch (error) {
-    console.log(`Failed to add ${surveyName.value}: ${error}`);
-  }
-}
-// Delete survey (active to false)
-const moveSurveyToTrashDB = async () => {
-  try {
-    // SET INACTIVE
-    await db.survey.update(survey_remove.value.id, {
-      active: 0,
-      changed: new Date(),
-    });
-    // DELETE: await db.survey.delete(survey_remove.value.id);
-    console.log(`Survey ${survey_remove.value.name} successfully deleted`);
-
-    // Reset data and close dialog
-    resetForm();
-
-    closeDialog();
-
-    // Reload surveys
-    loadSurveys();
-
-
-  } catch (error) {
-    console.log(`Failed to delete ${survey_remove.value.name}: ${error}`);
-  }
-}
-
-// Método onMounted
-const loadSurveys = async () => {
-  try {
-    // Where active is true
-    surveys.value = await db.survey.where('active').equals(1).toArray();
-    // ERRO:  DataError: Failed to execute 'bound' on 'IDBKeyRange': The parameter is not a valid key.
     console.log(`Loaded ${surveys.value.length} surveys`);
   } catch (error) {
-    console.log(`Failed to load surveys: ${error}`);
+    let text = `Failed to load surveys: ${error}`;
+
+    myAlert.value.createAlert('Error', text, 'error', 'mdi-alert');
+    console.log(text);
   }
 }
+// -----------------------------------------------------------------------------
 
-// lifecycle hooks
-onMounted(() => {
-  // Carregar os surveys
-  loadSurveys();
+// LIFECYCLE HOOKS
+// -----------------------------------------------------------------------------
+onMounted(async () => {
+  console.log('onMounted');
+  getAllSurveys();
 })
+onUpdated(() => {
+  console.log('onUpdated');
+})
+// -----------------------------------------------------------------------------
+
 </script>
 
 <style></style>

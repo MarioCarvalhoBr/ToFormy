@@ -63,7 +63,7 @@ import MyDialogSurveyComponent from '@/components/MyDialogSurveyComponent.vue';
 
 // Imports relativos (de outros arquivos do projeto)
 import surveyJson from '../../model_survey_survey.json';
-import { createSurveyDB, updateSurveyDB, deleteSurveyDB, readAllArchivedSurveysDB, setInactiveSurveyDB, setActiveSurveyDB } from '../../database/surveyDAO';
+import { createSurveyDB, updateSurveyDB, deleteSurveyDB, readAllArchivedSurveysDB, setActiveSurveyDB } from '../../database/surveyDAO';
 
 // SETUP SURVEYJS
 // -----------------------------------------------------------------------------

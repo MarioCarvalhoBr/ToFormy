@@ -15,6 +15,8 @@
 
     <my-snackbar-component ref="mySnackbar"></my-snackbar-component>
     <my-alert-component ref="myAlert"></my-alert-component>
+    <my-dialog-component ref="myDialogDelete" @confirm="confirmDialogDelete" @close="closeDialogDelete"></my-dialog-component>
+    <my-dialog-survey-component ref="myDialogSurvey" @close="closeDialogSurvey"></my-dialog-survey-component>
 
     <br>
     <v-row>
@@ -49,56 +51,11 @@
     </v-row>
   </div>
 
-  <div class="pa-4 text-center">
-    <v-dialog v-model="dialogBoxCreateEditView.show" max-width="600" persistent>
-      <v-card :prepend-icon="dialogBoxCreateEditView.icon" :title="dialogBoxCreateEditView.title">
-        <v-card-text>
-          <v-row dense>
-
-            <v-col cols="12">
-              <SurveyComponent :model="survey" />
-            </v-col>
-          </v-row>
-
-          <small class="text-caption text-medium-emphasis">*indicates required field</small>
-        </v-card-text>
-        <v-divider></v-divider>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn text="Close" variant="plain" @click="closeDialog"></v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </div>
-
-  <div class="pa-4 text-center">
-    <v-dialog v-model="dialogBoxDelete.show" max-width="600" persistent>
-      <v-card :prepend-icon="dialogBoxDelete.icon" :title="dialogBoxDelete.title">
-        <v-card-text>
-          <v-row dense>
-            <v-col cols="12">
-              <p>{{ dialogBoxDelete.message }} <strong>This action cannot be undone.</strong></p>
-            </v-col>
-          </v-row>
-        </v-card-text>
-        <v-divider></v-divider>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn text="Close" variant="plain" @click="closeDialog"></v-btn>
-          <v-btn color="error" text="Delete" variant="tonal" @click="deleteFormDB()"></v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </div>
 </template>
 
 <script setup>
 // Imports de bibliotecas externas
-import { ref, onMounted, defineComponent } from 'vue';
+import { ref, onMounted, defineComponent, onUpdated } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import { v4 as uuid } from 'uuid';
@@ -127,12 +84,15 @@ survey.onComplete.add(onCompleteSurveyResults);
 // Components
 import MySnackbarComponent from '../../components/MySnackbarComponent.vue';
 import MyAlertComponent from '../../components/MyAlertComponent.vue';
+import MyDialogComponent from '@/components/MyDialogComponent.vue';
+import MyDialogSurveyComponent from '@/components/MyDialogSurveyComponent.vue';
 
 
 // Uso de componente
 const mySnackbar = ref(defineComponent(MySnackbarComponent));
 const myAlert = ref(defineComponent(MyAlertComponent));
-
+const myDialogDelete = ref(defineComponent(MyDialogComponent));
+const myDialogSurvey = ref(defineComponent(MyDialogSurveyComponent));
 
 // VARS
 const is_edit = ref(false)
@@ -143,53 +103,51 @@ let forms = ref([])
 const form_to_edit = ref([])
 const form_to_delete = ref([])
 
-const dialogBoxCreateEditView = ref({
-  show: false,
-  title: 'Dialog title',
-  message: 'Dialog message',
-  color: 'primary',
-  icon: 'mdi-information'
-})
-
-const dialogBoxDelete = ref({
-  show: false,
-  title: 'Dialog title',
-  message: 'Dialog message',
-  color: 'primary',
-  icon: 'mdi-information'
-})
-
-// Create dialog box function
-const createDialogBox = (dialog, title, message, color = 'primary', icon = 'mdi-information') => {
-  dialog.value.show = true;
-  dialog.value.title = title;
-  dialog.value.message = message;
-  dialog.value.color = color;
-  dialog.value.icon = icon;
+// DELETE: Functions and methods to utilize the dialog component
+const openDialogDeleteForm = (form) => {
+  console.log('openDialogDeleteForm to form:', JSON.stringify(form, null, 3));
+  form_to_delete.value = form;
+  myDialogDelete.value.createDialog('Delete form', `Are you sure you want to delete the form '${form.name}'? This action cannot be undone.`, 'error', 'mdi-delete', { confirm: 'Delete', cancel: 'Close' }, { confirm: 'red', cancel: 'black' });
 }
+const closeDialogDelete = () => {
+  console.log('Closed from MyDialogComponent');
+  // loadFormsDB();
+};
+const confirmDialogDelete = () => {
+  console.log('Confirmed from MyDialogComponent');
+  deleteFormDB();
+};
 
-// Functions to utilize the dialog component
+// SURVEY: Functions and methods to utilize the dialog component
 // Function to open the dialog to create a new form
 const openDialogAddForm = () => {
-  createDialogBox(dialogBoxCreateEditView, 'Create a new form', 'Create a new form', 'primary', 'mdi-account');
+  // Clear the survey
+  survey.clear();
+  survey.mode = 'edit';
+  // Edit mode
+  is_edit.value = false
+
+  myDialogSurvey.value.createDialog('New form', 'New form', 'primary', 'mdi-plus', survey);
 }
 // Function to open the dialog to view the form
 const openDialogViewForm = (form) => {
   console.log('View form:', form);
-
-  is_edit.value = false
-
   // Setup SurveyJS
   survey.data = form;
   survey.showProgressBar = 'none';
   survey.mode = 'display';
-  survey.completedHtml = '<h5><strong>Thank you for completing the form!</strong></h5>';
+  // View mode
+  is_edit.value = false
 
-  // Creating the dialog
-  createDialogBox(dialogBoxCreateEditView, 'View form', 'View form', 'primary', 'mdi-eye');
+  myDialogSurvey.value.createDialog('View form', 'View form', 'primary', 'mdi-eye', survey);
 }
+
 // Function to open the dialog to edit the form
 const openDialogEditForm = (form) => {
+  // Clear the survey
+  survey.clear();
+  survey.mode = 'edit';
+
   console.log('openDialogEditForm to form:', JSON.stringify(form, null, 3));
 
   // Edit mode
@@ -199,28 +157,15 @@ const openDialogEditForm = (form) => {
   // Setup SurveyJS
   survey.data = form;
 
-  // Creating the dialog
-  createDialogBox(dialogBoxCreateEditView, 'Edit form', 'Edit form', 'primary', 'mdi-pencil');
+  // Create the dialog
+  myDialogSurvey.value.createDialog('Edit form', 'Edit form', 'primary', 'mdi-pencil', survey);
 }
-// Function to open the dialog to delete the form
-const openDialogDeleteForm = (form) => {
-  console.log('openDialogDeleteForm to form:', JSON.stringify(form, null, 3));
-  // Remove mode
-  form_to_delete.value = form;
 
-  // Creating the dialog
-  createDialogBox(dialogBoxDelete, 'Delete form', `Are you sure you want to delete the form '${form.name}'?`, 'error', 'mdi-delete');
-}
-// Function to close the dialog
-const closeDialog = () => {
-  // Resetar o survey
+const closeDialogSurvey = () => {
+  console.log('Closed from MyDialogSurveyComponent');
+  // Clear the survey
   survey.clear();
-
-  dialogBoxCreateEditView.value.show = false;
-  dialogBoxDelete.value.show = false;
-
-  loadFormsDB();
-}
+};
 
 // formDAO.js
 // Create or update form in IndexedDB
@@ -330,8 +275,6 @@ const deleteFormDB = async () => {
     myAlert.value.createAlert('Error', text, 'error', 'mdi-alert');
     console.log(text);
   }
-
-  closeDialog();
 }
 // Load forms from IndexedDB
 const loadFormsDB = async () => {
@@ -365,6 +308,10 @@ const verifySurveyIdDB = async () => {
 onMounted(async () => {
   console.log('onMounted');
   verifySurveyIdDB();
+})
+
+onUpdated(() => {
+  console.log('onUpdated');
 })
 
 </script>

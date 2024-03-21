@@ -58,11 +58,27 @@
   ]
 
   const drawer = ref(null)
-
-
   const theme = useTheme()
 
+  // Toggle theme
   function toggleTheme () {
-    theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
+    if (theme.global.current.value.dark) {
+      theme.global.name.value = 'light'
+      localStorage.setItem('theme', 'light')
+    } else {
+      theme.global.name.value = 'dark'
+      localStorage.setItem('theme', 'dark')
+    }
   }
+  // Verify if the user has a theme preference
+  if (localStorage.getItem('theme')) {
+    let themeValue = localStorage.getItem('theme')
+    if (themeValue === 'dark') {
+      theme.global.name.value = 'dark'
+    } else {
+      theme.global.name.value = 'light'
+      localStorage.setItem('theme', 'light')
+    }
+  }
+
 </script>

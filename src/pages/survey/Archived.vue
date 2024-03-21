@@ -226,7 +226,7 @@ const getAllSurveys = async (survey_code) => {
 
     // Verifica se o surveys está vazio
     if (surveys.value.length === 0) {
-      myAlert.value.createAlert('No surveys found', 'Click on the "New Survey" button to create a new survey', 'info', 'mdi-insurveyation');
+      myAlert.value.createAlert('No surveys found', '', 'info', 'mdi-insurveyation');
     }else{
       myAlert.value.alert.show = false;
     }

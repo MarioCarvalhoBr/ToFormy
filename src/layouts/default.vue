@@ -5,8 +5,14 @@
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
       <v-app-bar-title>ToFormy</v-app-bar-title>
-    </v-app-bar>
 
+      <v-spacer></v-spacer>
+
+      <v-btn icon @click="() => $router.push('/about')">
+        <v-icon>mdi-information</v-icon>
+      </v-btn>
+
+    </v-app-bar>
 
     <v-navigation-drawer v-model="drawer">
 

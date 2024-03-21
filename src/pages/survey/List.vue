@@ -10,7 +10,7 @@
 
     <v-row>
       <v-col v-for="survey in surveys" :key="survey.id" cols="12" md="6" lg="3">
-        <v-card class="elevation-8" color="indigo" dark>
+        <v-card class="elevation-8" color="indigo-darken-4" dark>
           <v-card-title>{{ survey.data.name }}</v-card-title>
           <v-card-subtitle>{{ survey.data.description }}</v-card-subtitle>
           <v-card-text>{{ survey.data.city }}, {{ survey.data.state }}, {{ survey.data.country}}</v-card-text>

@@ -1,79 +1,69 @@
-# Vuetify (Default)
+Aqui está o `README.md` para o aplicativo ToFormy, preenchido com os detalhes fornecidos:
 
-This is the official scaffolding tool for Vuetify, designed to give you a head start in building your new Vuetify application. It sets up a base template with all the necessary configurations and standard directory structure, enabling you to begin development without the hassle of setting up the project from scratch.
+```markdown
+# ToFormy
 
-## ❗️ Important Links
+ToFormy é uma solução inovadora e robusta, projetada para atender às necessidades de coleta e gerenciamento de dados em diversos contextos. Ideal para organizações, pesquisadores e profissionais que necessitam de uma ferramenta eficaz para coletar informações, ToFormy oferece uma plataforma intuitiva e flexível, permitindo a criação de formulários personalizados adaptados a qualquer necessidade específica de coleta de dados.
 
-- 📄 [Docs](https://vuetifyjs.com/)
-- 🚨 [Issues](https://issues.vuetifyjs.com/)
-- 🏬 [Store](https://store.vuetifyjs.com/)
-- 🎮 [Playground](https://play.vuetifyjs.com/)
-- 💬 [Discord](https://community.vuetifyjs.com)
+## Principais Características
 
-## 💿 Install
+- **Coleta de Dados Personalizada**: Crie formulários personalizados que se adequam exatamente às suas necessidades de coleta de dados.
+- **Armazenamento em Banco de Dados**: Os dados coletados são armazenados de maneira segura, facilitando o acesso e a gestão da informação.
+- **Funcionalidade Offline**: ToFormy oferece suporte para coleta de dados offline.
+- **Design Responsivo**: A interface do usuário é projetada para funcionar em qualquer dispositivo, adaptando-se perfeitamente a diferentes tamanhos de tela.
+- **Exportação de Dados**: Exporte os dados coletados para CSV, facilitando a análise e integração com outros sistemas.
 
-Set up your project using your preferred package manager. Use the corresponding command to install the dependencies:
+## Como Começar
 
-| Package Manager                                                | Command        |
-|---------------------------------------------------------------|----------------|
-| [yarn](https://yarnpkg.com/getting-started)                   | `yarn install` |
-| [npm](https://docs.npmjs.com/cli/v7/commands/npm-install)     | `npm install`  |
-| [pnpm](https://pnpm.io/installation)                          | `pnpm install` |
-| [bun](https://bun.sh/#getting-started)                        | `bun install`  |
+### Pré-Requisitos
 
-After completing the installation, your environment is ready for Vuetify development.
+- Node.js (recomenda-se a versão mais recente estável)
+- NPM (Node Package Manager)
 
-## ✨ Features
+### Instalação
 
-- 🖼️ **Optimized Front-End Stack**: Leverage the latest Vue 3 and Vuetify 3 for a modern, reactive UI development experience. [Vue 3](https://v3.vuejs.org/) | [Vuetify 3](https://vuetifyjs.com/en/)
-- 🗃️ **State Management**: Integrated with [Pinia](https://pinia.vuejs.org/), the intuitive, modular state management solution for Vue.
-- 🚦 **Routing and Layouts**: Utilizes Vue Router for SPA navigation and vite-plugin-vue-layouts for organizing Vue file layouts. [Vue Router](https://router.vuejs.org/) | [vite-plugin-vue-layouts](https://github.com/JohnCampionJr/vite-plugin-vue-layouts)
-- ⚡ **Next-Gen Tooling**: Powered by Vite, experience fast cold starts and instant HMR (Hot Module Replacement). [Vite](https://vitejs.dev/)
-- 🧩 **Automated Component Importing**: Streamline your workflow with unplugin-vue-components, automatically importing components as you use them. [unplugin-vue-components](https://github.com/antfu/unplugin-vue-components)
-
-These features are curated to provide a seamless development experience from setup to deployment, ensuring that your Vuetify application is both powerful and maintainable.
-
-## 💡 Usage
-
-This section covers how to start the development server and build your project for production.
-
-### Starting the Development Server
-
-To start the development server with hot-reload, run the following command. The server will be accessible at [http://localhost:3000](http://localhost:3000):
+1. Clone o repositório ToFormy:
 
 ```bash
-yarn dev
+git clone https://github.com/MarioCarvalhoBr/ToFormy.git
+cd ToFormy
 ```
 
-(Repeat for npm, pnpm, and bun with respective commands.)
-
-> NODE_OPTIONS='--no-warnings' is added to suppress the JSON import warnings that happen as part of the Vuetify import mapping. If you are on Node [v21.3.0](https://nodejs.org/en/blog/release/v21.3.0) or higher, you can change this to NODE_OPTIONS='--disable-warning=5401'. If you don't mind the warning, you can remove this from your package.json dev script.
-
-### Building for Production
-
-To build your project for production, use:
+2. Instale as dependências do projeto:
 
 ```bash
-yarn build
+npm install
 ```
 
-(Repeat for npm, pnpm, and bun with respective commands.)
+3. Inicie o servidor de desenvolvimento:
 
-Once the build process is completed, your application will be ready for deployment in a production environment.
+```bash
+npm run serve
+```
 
-## 💪 Support Vuetify Development
+Após iniciar o servidor, você poderá acessar o ToFormy em `http://localhost:8080` (ou a porta indicada no terminal).
 
-This project is built with [Vuetify](https://vuetifyjs.com/en/), a UI Library with a comprehensive collection of Vue components. Vuetify is an MIT licensed Open Source project that has been made possible due to the generous contributions by our [sponsors and backers](https://vuetifyjs.com/introduction/sponsors-and-backers/). If you are interested in supporting this project, please consider:
+## Uso
 
-- [Requesting Enterprise Support](https://support.vuetifyjs.com/)
-- [Sponsoring John on Github](https://github.com/users/johnleider/sponsorship)
-- [Sponsoring Kael on Github](https://github.com/users/kaelwd/sponsorship)
-- [Supporting the team on Open Collective](https://opencollective.com/vuetify)
-- [Becoming a sponsor on Patreon](https://www.patreon.com/vuetify)
-- [Becoming a subscriber on Tidelift](https://tidelift.com/subscription/npm/vuetify)
-- [Making a one-time donation with Paypal](https://paypal.me/vuetify)
+Utilize o ToFormy para criar seus formulários personalizados, coletar dados e exportá-los conforme necessário.
 
-## 📑 License
-[MIT](http://opensource.org/licenses/MIT)
+## Contribuição
 
-Copyright (c) 2016-present Vuetify, LLC
+Contribuições para o ToFormy são bem-vindas! Se você tem ideias ou sugestões para melhorar o aplicativo, sinta-se à vontade para criar um fork do repositório e enviar um pull request.
+
+## Licença
+
+ToFormy está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## Contato
+
+- Autor: Mário de Araújo Carvalho
+- Email: mariodearaujocarvalho@gmail.com
+- Projeto: [https://github.com/MarioCarvalhoBr/ToFormy](https://github.com/MarioCarvalhoBr/ToFormy)
+
+---
+
+Aproveite o ToFormy para suas necessidades de coleta de dados!
+```
+
+Este `README.md` oferece uma visão geral completa do ToFormy, incluindo uma descrição, características principais, instruções de instalação e uso, informações sobre contribuição, licença e contato.

@@ -105,7 +105,7 @@ const form_to_delete = ref(null)
 const openDialogDeleteForm = (form) => {
   console.log('openDialogDeleteForm to form:', JSON.stringify(form, null, 3));
   form_to_delete.value = form;
-  myDialogDelete.value.createDialog('Delete form', `Are you sure you want to delete the form '${form.name}'? This action cannot be undone.`, 'error', 'mdi-delete', { confirm: 'Delete', cancel: 'Close' }, { confirm: 'red', cancel: 'black' });
+  myDialogDelete.value.createDialog('Delete form', `Are you sure you want to delete this form? This action cannot be undone.`, 'error', 'mdi-delete', { confirm: 'Delete', cancel: 'Close' }, { confirm: 'red', cancel: 'black' });
 }
 const closeDialogDelete = () => {
   console.log('Closed from MyDialogComponent');
@@ -165,23 +165,28 @@ const closeDialogSurvey = () => {
 const createOrUpdateForm = async (data) => {
   try {
     let color = 'green';
+    let idKey = 0;
 
     if (is_edit_form_dialog.value) {
       color = 'blue-darken-4';
       // Update form
       await updateFormDB(form_to_edit.value.id, data);
-
-      console.log(`Form ${data.first_name} successfully updated`);
+      idKey = form_to_edit.value.id;
     } else {
       const id = await createFormDB(survey_code_route.value, data);
-
-      console.log(`Form ${data.first_name} successfully added. Got id ${id}`);
+      idKey = id;
     }
-    let message = `Form ${data.first_name} successfully ${is_edit_form_dialog.value ? 'updated' : 'added'}`;
+    let message = `Form ${is_edit_form_dialog.value ? 'updated' : 'created'} successfully.`;
     mySnackbar.value.createSnackbar(message, color, 3000);
+    console.log(message + `. Got id: ${idKey}`);
 
   } catch (error) {
-    let text = `Failed to add ${data.first_name}: ${error}`;
+    let text = ''
+    if (is_edit_form_dialog.value) {
+      text = `Failed to update form: ${error}`;
+    } else {
+      text = `Failed to create form: ${error}`;
+    }
 
     myAlert.value.createAlert('Error', text, 'error', 'mdi-alert');
     console.log(text);
@@ -190,11 +195,12 @@ const createOrUpdateForm = async (data) => {
 const deleteForm = async (form) => {
   try {
     await deleteFormDB(form.value.id);
+    let message = `Form deleted successfully.`;
 
-    mySnackbar.value.createSnackbar(`Form ${form.value.name} successfully deleted`, 'red-darken-4', 3000);
-    console.log(`Form ${form.value.name} successfully deleted`);
+    mySnackbar.value.createSnackbar(message, 'red-darken-4', 3000);
+    console.log(message + `. Got id: ${form.value.id}`);
   } catch (error) {
-    let text = `Failed to delete ${form.value.name}: ${error}`;
+    let text = `Failed to delete form: ${error}`;
 
     myAlert.value.createAlert('Error', text, 'error', 'mdi-alert');
     console.log(text);

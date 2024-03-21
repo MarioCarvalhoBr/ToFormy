@@ -2,11 +2,12 @@ import { v4 as uuid } from 'uuid';
 import { db } from './db';
 
 export function createFormDB(survey_code, data) {
+  let KEY_UUID = uuid();
   return db.form.add({
     // Identification
     survey_code: survey_code,
-    code: uuid(),
-    name: data.first_name + ' ' + data.last_name,
+    code: KEY_UUID,
+    name: "Form " + KEY_UUID,
     // Temporal
     created: new Date(),
     changed: new Date(),
@@ -18,8 +19,6 @@ export function createFormDB(survey_code, data) {
 
 export function updateFormDB(id, data) {
   return db.form.update(id, {
-    // Identification
-    name: data.first_name + ' ' + data.last_name,
     // Temporal
     changed: new Date(),
     // Model

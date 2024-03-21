@@ -103,7 +103,7 @@ const survey_to_delete = ref(null)
 const openDialogDeleteSurvey = (survey) => {
   console.log('openDialogDeleteSurvey to survey:', JSON.stringify(survey, null, 3));
   survey_to_delete.value = survey;
-  myDialogDelete.value.createDialog('Delete survey', `Are you sure you want to delete the survey '${survey.name}'? This action cannot be undone.`, 'error', 'mdi-delete', { confirm: 'Delete', cancel: 'Close' }, { confirm: 'red', cancel: 'grey' });
+  myDialogDelete.value.createDialog('Delete survey', `Are you sure you want to delete this survey? This action cannot be undone.`, 'error', 'mdi-delete', { confirm: 'Delete', cancel: 'Close' }, { confirm: 'red', cancel: 'grey' });
 }
 const closeDialogDelete = () => {
   console.log('Closed from MyDialogComponent');
@@ -119,7 +119,7 @@ const confirmDialogDelete = () => {
 const openDialogArchiveSurvey = (survey) => {
   console.log('openDialogArchiveSurvey to survey:', JSON.stringify(survey, null, 3));
   survey_to_delete.value = survey;
-  myDialogArchive.value.createDialog('Archive survey', `Are you sure you want to archive the survey '${survey.name}'?  This action can be undone in 'Trash' menu.`, 'warning', 'mdi-archive', { confirm: 'Archive', cancel: 'Close' }, { confirm: 'orange', cancel: 'grey' });
+  myDialogArchive.value.createDialog('Archive survey', `Are you sure you want to archive this survey?  This action can be undone in 'Archived' menu.`, 'warning', 'mdi-archive', { confirm: 'Archive', cancel: 'Close' }, { confirm: 'orange', cancel: 'grey' });
 }
 const closeDialogArchive = () => {
   console.log('Closed from MyDialogComponent');
@@ -183,23 +183,25 @@ const closeDialogSurvey = () => {
 const createOrUpdateSurvey = async (data) => {
   try {
     let color = 'green';
+    let idKey = 0;
 
     if (is_edit_survey_dialog.value) {
-      color = 'blue-darken-4';
       // Update survey
+      color = 'blue-darken-4';
       await updateSurveyDB(survey_to_edit.value.id, data);
-
-      console.log(`Survey ${data.first_name} successfully updated`);
+      idKey = survey_to_edit.value.id;
     } else {
+      // Create survey
       const id = await createSurveyDB(data);
-
-      console.log(`Survey ${data.first_name} successfully added. Got id ${id}`);
+      idKey = id;
     }
-    let message = `Survey ${data.first_name} successfully ${is_edit_survey_dialog.value ? 'updated' : 'added'}`;
+    let message = `Survey ${is_edit_survey_dialog.value ? 'updated' : 'created'} successfully.`;
+
     mySnackbar.value.createSnackbar(message, color, 3000);
+    console.log(message + ` Got id ${idKey}. Survey: ${JSON.stringify(data, null, 3)}`);
 
   } catch (error) {
-    let text = `Failed to add ${data.first_name}: ${error}`;
+    let text = `Failed to add survey: ${error}`;
 
     myAlert.value.createAlert('Error', text, 'error', 'mdi-alert');
     console.log(text);
@@ -208,27 +210,28 @@ const createOrUpdateSurvey = async (data) => {
 const deleteSurvey = async (survey) => {
   try {
     await deleteSurveyDB(survey.value);
+    let message = `Survey deleted successfully.`;
 
-    mySnackbar.value.createSnackbar(`Survey ${survey.value.name} successfully deleted`, 'red-darken-4', 3000);
-    console.log(`Survey ${survey.value.name} successfully deleted`);
+    mySnackbar.value.createSnackbar(message, 'red-darken-4', 3000);
+    console.log(message + ` Got id ${survey.value.id}. Survey: ${JSON.stringify(survey, null, 3)}`);
   } catch (error) {
-    let text = `Failed to delete ${survey.value.name}: ${error}`;
+    let text = `Failed to delete survey: ${error}.`;
 
     myAlert.value.createAlert('Error', text, 'error', 'mdi-alert');
-    console.log(text);
+    console.log(text + ` Got id ${survey.value.id}. Survey: ${JSON.stringify(survey, null, 3)}`);
   }
 }
 const moveSurveyToArchive = async (survey) => {
   try {
     await setInactiveSurveyDB(survey.value.id);
-
-    mySnackbar.value.createSnackbar(`Survey ${survey.value.name} successfully moved to trash`, 'orange-darken-4', 3000);
-    console.log(`Survey ${survey.value.name} successfully moved to trash`);
+    let message = `Survey moved to archive successfully.`;
+    mySnackbar.value.createSnackbar(message, 'orange-darken-4', 3000);
+    console.log(message + ` Got id ${survey.value.id}. Survey: ${JSON.stringify(survey, null, 3)}`);
   } catch (error) {
-    let text = `Failed to move to trash ${survey.value.name}: ${error}`;
+    let text = `Failed to move to archive survey: ${error}.`;
 
     myAlert.value.createAlert('Error', text, 'error', 'mdi-alert');
-    console.log(text);
+    console.log(text + ` Got id ${survey.value.id}. Survey: ${JSON.stringify(survey, null, 3)}`);
   }
 }
 const getAllSurveys = async (survey_code) => {
@@ -238,7 +241,7 @@ const getAllSurveys = async (survey_code) => {
 
     // Verifica se o surveys está vazio
     if (surveys.value.length === 0) {
-      myAlert.value.createAlert('No surveys found', 'Click on the "New Survey" button to create a new survey', 'info', 'mdi-insurveyation');
+      myAlert.value.createAlert('No surveys found', 'Click on the "New Survey" button to create a new survey', 'info', 'mdi-information');
     }else{
       myAlert.value.alert.show = false;
     }

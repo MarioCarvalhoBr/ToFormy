@@ -6,10 +6,11 @@ export function getByCodeSurveyDB(survey_code) {
 }
 // createSurveyDB
 export function createSurveyDB(data) {
+  let KEY_UUID = uuid();
   return db.survey.add({
     // Identification
-    code: uuid(),
-    name: data.name,
+    code: KEY_UUID,
+    name: "Survey " + KEY_UUID,
     // Temporal
     created: new Date(),
     changed: new Date(),
@@ -21,8 +22,6 @@ export function createSurveyDB(data) {
 
 export function updateSurveyDB(id, data) {
   return db.survey.update(id, {
-    // Identification
-    name: data.name,
     // Temporal
     changed: new Date(),
     // Model
@@ -47,7 +46,7 @@ export function readAllArchivedSurveysDB() {
   return db.survey.where('active').equals(0).toArray();
 }
 
-// setArchiveSurveyDB
+// setActiveSurveyDB
 export function setActiveSurveyDB(id) {
   return db.survey.update(id, {
     active: 1,

@@ -1,51 +1,37 @@
 <template>
-  <v-container class="pa-1">
-    <v-row justify="center">
-      <v-col cols="12" sm="12" md="12">
-        <v-card class="elevation-12" outlined>
-          <v-card-title class="justify-center">Settings</v-card-title>
-          <v-card-text>
-            <v-list>
+  <div>
+    <div class="d-flex align-center">
+      <h1 class="flex-grow-1">Settings</h1>
+    </div>
 
+    <v-card class="elevation-2" outlined>
+      <v-card-text>
+        <v-list>
 
-              <v-list-item>
-                <v-list-item-title>Select Material Design Theme</v-list-item-title>
-                <v-list-item-subtitle>
-                  <v-select
-                    v-model="settings.blueprint.selected"
-                    :items="settings.blueprint.items"
-                    label="Select Material Design Theme"
-                  ></v-select>
-                </v-list-item-subtitle>
-              </v-list-item>
+          <v-list-item>
+            <v-list-item-title>Select Material Design Theme</v-list-item-title>
+            <v-list-item-subtitle>
+              <v-select v-model="settings.blueprint.selected" :items="settings.blueprint.items"
+                label="Select Material Design Theme"></v-select>
+            </v-list-item-subtitle>
+          </v-list-item>
 
-              <v-list-item>
-                <v-list-item-title>Set Dark Mode Theme</v-list-item-title>
-                <v-list-item-subtitle>
-                  <v-switch
-                    v-model="settings.darkmode"
-                    label="Dark mode"
-                  ></v-switch>
-                </v-list-item-subtitle>
-              </v-list-item>
+          <v-list-item>
+            <v-list-item-title>Set Dark Mode Theme</v-list-item-title>
+            <v-list-item-subtitle>
+              <v-switch v-model="settings.darkmode" label="Dark mode"></v-switch>
+            </v-list-item-subtitle>
+          </v-list-item>
 
-              <v-btn
-                @click="saveSettings()"
-                color="primary"
-                dark
-                large
-                outlined
-              >
-                Save Settings
-              </v-btn>
+          <v-btn @click="saveSettings()" color="primary" dark large outlined>
+            Save Settings
+          </v-btn>
 
+        </v-list>
+      </v-card-text>
+    </v-card>
+  </div>
 
-            </v-list>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
 </template>
 
 
@@ -54,11 +40,8 @@
 import { ref } from 'vue'
 import { useTheme } from 'vuetify'
 
-
-
-
+// VARS
 const theme = useTheme()
-
 const settings = ref({
   darkmode: ref(localStorage.getItem('theme') === 'dark' || false),
   blueprint: {
@@ -71,7 +54,7 @@ const settings = ref({
   }
 })
 
-// Methods
+// METHODS
 const saveSettings = () => {
   // Save blueprint theme settings
   console.log("Save blueprint theme settings")

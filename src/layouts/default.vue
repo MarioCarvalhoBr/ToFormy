@@ -1,7 +1,7 @@
 <template>
   <v-app id="inspire">
 
-    <v-app-bar>
+    <v-app-bar class="">
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
       <v-app-bar-title>ToFormy</v-app-bar-title>

@@ -35,7 +35,7 @@ npm install
 3. Inicie o servidor de desenvolvimento:
 
 ```bash
-npm run serve
+npm run dev
 ```
 
 Após iniciar o servidor, você poderá acessar o ToFormy em `http://localhost:8080` (ou a porta indicada no terminal).

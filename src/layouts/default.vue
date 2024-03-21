@@ -8,8 +8,8 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn icon @click="() => $router.push('/about')">
-        <v-icon>mdi-information</v-icon>
+      <v-btn icon @click="toggleTheme">
+        <v-icon>{{ theme.global.current.value.dark ? 'mdi-white-balance-sunny' : 'mdi-weather-night' }}</v-icon>
       </v-btn>
 
     </v-app-bar>
@@ -44,6 +44,7 @@
 
 <script setup>
   import { ref } from 'vue'
+  import { useTheme } from 'vuetify'
 
   const links = [
     // Home page
@@ -57,4 +58,11 @@
   ]
 
   const drawer = ref(null)
+
+
+  const theme = useTheme()
+
+  function toggleTheme () {
+    theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
+  }
 </script>

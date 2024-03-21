@@ -33,7 +33,7 @@
 
     <v-main>
       <v-container
-        class="py-8 px-6"
+        class="py-0 px-6"
         fluid
       >
       <router-view></router-view>
@@ -53,6 +53,8 @@
     ['mdi-form-select', 'My Surveys', '/survey/list'],
     // Archived
     ['mdi-archive', 'Archived', '/survey/archived'],
+    // Settings
+    ['mdi-cog', 'Settings', '/settings'],
     // About
     ['mdi-information', 'About', '/about'],
   ]
@@ -80,5 +82,6 @@
       localStorage.setItem('theme', 'light')
     }
   }
+
 
 </script>

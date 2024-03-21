@@ -16,7 +16,7 @@ ToFormy is an advanced application aimed at collecting and managing data, ideal 
 
 | Screen 1 | Screen 2 | Screen 3 | Screen 4 |
 | --- | --- | --- | --- |
-| ![Mobile Screen 5](screenshots/mobile/image_05.png) | ![Mobile Screen 13](screenshots/mobile/image_13.png) | ![Mobile Screen 2](screenshots/mobile/image_02.png) | ![Mobile Screen 1](screenshots/mobile/image_01.png) |
+| ![Mobile Screen 5](screenshots/mobile/image_05.png) | ![Mobile Screen 13](screenshots/mobile/image_13.png) | ![Mobile Screen 14](screenshots/mobile/image_14.png) | ![Mobile Screen 02](screenshots/mobile/image_02.png) |
 
 ## How to begin
 
@@ -73,6 +73,10 @@ Contributions to ToFormy are welcome! If you have ideas or suggestions to improv
 | ![Desktop Screen 1](URL_DA_IMAGEM_1_DESKTOP) | ![Desktop Screen 2](URL_DA_IMAGEM_2_DESKTOP) | ![Desktop Screen 3](URL_DA_IMAGEM_3_DESKTOP) | ![Desktop Screen 4](URL_DA_IMAGEM_4_DESKTOP) |
 
 
+## Dark Mode Support
+| Light Mode | Dark Mode |
+| --- | --- |
+| ![Mobile Screen 14](screenshots/mobile/image_14.png) | ![Mobile Screen 15](screenshots/mobile/image_15.png) |
 
 ## License
 

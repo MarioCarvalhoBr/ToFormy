@@ -31,7 +31,7 @@ ToFormy is an advanced application aimed at collecting and managing data, ideal 
 
 ```bash
 git clone https://github.com/MarioCarvalhoBr/ToFormy.git
-cdToFormy
+cd ToFormy
 ```
 
 2. Install project dependencies:

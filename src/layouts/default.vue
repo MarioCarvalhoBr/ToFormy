@@ -40,6 +40,14 @@
       </v-container>
     </v-main>
   </v-app>
+
+  <v-footer class="d-flex flex-column align-items-center justify-content-center">
+  <div class="px-4 py-2 bg-primary text-center w-100">
+    <p>All rights reserved. ToFormy. Copyright © {{ new Date().getFullYear() }}</p>
+  </div>
+
+</v-footer>
+
 </template>
 
 <script setup>
